@@ -1,38 +1,54 @@
-const CreateRequestController = require('../controller/personinneed_createrequest');
+const personinneed_createrequest = require('../controller/personinneed_createrequest');
 
-class CreateRequestBoundary {
+class Personinneed_createrequestBoundary {
     constructor() {
-        this.controller = new CreateRequestController();
-    }
-    onClick() {
-        console.log('PersoninneedCreaterequestBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_createrequest();
     }
 
-    displayCreateRequestForm() {
-        console.log('=== Create Request ===');
-        console.log('Please enter your request details:');
+    handleCreateRequest(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.createRequest(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleCreateRequest(requestData) {
-        console.log('CreateRequestBoundary: Handling create request...');
-        return this.controller.createRequest(requestData);
+    handleFormSubmission(formData) {
+        return this.handleCreateRequest(formData);
     }
-
-    displayCreateRequestResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for createrequest business logic
+        return {
+            title: uiData.title,
+            category: uiData.category,
+            description: uiData.description,
+            urgency: uiData.urgency,
+            contact: uiData.contact,
+            createdBy: uiData.userId,
+            userType: 'personinneed',
+            status: 'pending'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Request created successfully!');
-            console.log(`Request ID: ${result.data.request.id}`);
-            console.log(`Title: ${result.data.request.title}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Failed to create request!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = CreateRequestBoundary;
+module.exports = Personinneed_createrequestBoundary;

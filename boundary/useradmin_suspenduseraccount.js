@@ -1,38 +1,48 @@
-const SuspendUserAccountController = require('../controller/useradmin_suspenduseraccount');
+const useradmin_suspenduseraccount = require('../controller/useradmin_suspenduseraccount');
 
-class SuspendUserAccountBoundary {
+class Useradmin_suspenduseraccountBoundary {
     constructor() {
-        this.controller = new SuspendUserAccountController();
-    }
-    onClick() {
-        console.log('UseradminSuspenduseraccountBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_suspenduseraccount();
     }
 
-    displaySuspendUserAccountForm() {
-        console.log('=== Suspend User Account ===');
-        console.log('Please enter the account ID to suspend:');
+    handleSuspendUserAccount(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.suspendUserAccount(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSuspendUserAccount(accountId, reason) {
-        console.log('SuspendUserAccountBoundary: Handling suspend user account request...');
-        return this.controller.suspendUserAccount(accountId, reason);
+    handleFormSubmission(formData) {
+        return this.handleSuspendUserAccount(formData);
     }
-
-    displaySuspendUserAccountResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for suspenduseraccount business logic
+        return {
+            ...uiData,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ User account suspended successfully!');
-            console.log(`Account ID: ${result.data.account.id}`);
-            console.log(`Status: ${result.data.account.status}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Failed to suspend user account!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SuspendUserAccountBoundary;
+module.exports = Useradmin_suspenduseraccountBoundary;

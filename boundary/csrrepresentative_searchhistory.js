@@ -1,8 +1,8 @@
-const personinneed_searchhistory = require('../controller/personinneed_searchhistory');
+const SearchHistoryController = require('../controller/csrrepresentative_searchhistory');
 
-class Personinneed_searchhistoryBoundary {
+class Csrrepresentative_searchhistoryBoundary {
     constructor() {
-        this.controller = new personinneed_searchhistory();
+        this.controller = new SearchHistoryController();
     }
 
     handleSearchHistory(data) {
@@ -21,10 +21,13 @@ class Personinneed_searchhistoryBoundary {
     }
     
     formatDataForController(uiData) {
-        // Format UI data for searchhistory business logic
+        // Format UI data for search history business logic
         return {
-            ...uiData,
-            userType: 'personinneed'
+            userId: uiData.userId,
+            serviceType: uiData.serviceType || null,
+            startDate: uiData.startDate || null,
+            endDate: uiData.endDate || null,
+            userType: 'csrrepresentative'
         };
     }
     
@@ -33,8 +36,8 @@ class Personinneed_searchhistoryBoundary {
         if (result.success) {
             return {
                 success: true,
-                message: result.message || 'Operation successful',
-                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+                message: result.message || 'History search completed successfully',
+                redirectUrl: '/csrrepresentative/dashboard'
             };
         } else {
             return {
@@ -45,4 +48,5 @@ class Personinneed_searchhistoryBoundary {
     }
 }
 
-module.exports = Personinneed_searchhistoryBoundary;
+module.exports = Csrrepresentative_searchhistoryBoundary;
+

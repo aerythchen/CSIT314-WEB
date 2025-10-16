@@ -1,40 +1,48 @@
-const SearchUserAccountController = require('../controller/useradmin_searchuseraccount');
+const useradmin_searchuseraccount = require('../controller/useradmin_searchuseraccount');
 
-class SearchUserAccountBoundary {
+class Useradmin_searchuseraccountBoundary {
     constructor() {
-        this.controller = new SearchUserAccountController();
-    }
-    onClick() {
-        console.log('UseradminSearchuseraccountBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_searchuseraccount();
     }
 
-    displaySearchUserAccountForm() {
-        console.log('=== Search User Account ===');
-        console.log('Please enter search criteria:');
+    handleSearchUserAccount(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.searchUserAccount(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSearchUserAccount(searchCriteria) {
-        console.log('SearchUserAccountBoundary: Handling search user account request...');
-        return this.controller.searchUserAccount(searchCriteria);
+    handleFormSubmission(formData) {
+        return this.handleSearchUserAccount(formData);
     }
-
-    displaySearchUserAccountResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for searchuseraccount business logic
+        return {
+            ...uiData,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Search completed successfully!');
-            console.log(`Found ${result.data.accounts.length} accounts:`);
-            result.data.accounts.forEach(account => {
-                console.log(`- ${account.username} (${account.status})`);
-            });
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Search failed!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SearchUserAccountBoundary;
+module.exports = Useradmin_searchuseraccountBoundary;

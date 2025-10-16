@@ -1,35 +1,48 @@
-const ViewCategoryController = require('../controller/platformmanager_viewcategory');
+const platformmanager_viewcategory = require('../controller/platformmanager_viewcategory');
 
-class ViewCategoryBoundary {
+class Platformmanager_viewcategoryBoundary {
     constructor() {
-        this.controller = new ViewCategoryController();
+        this.controller = new platformmanager_viewcategory();
     }
 
-    displayViewCategoryForm() {
-        console.log('=== View Category ===');
-        console.log('Please enter the category ID to view:');
+    handleViewCategory(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.viewCategory(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleViewCategory(categoryId) {
-        console.log('ViewCategoryBoundary: Handling view category...');
-        return this.controller.viewCategory(categoryId);
+    handleFormSubmission(formData) {
+        return this.handleViewCategory(formData);
     }
-
-    displayViewCategoryResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for viewcategory business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Category retrieved successfully!');
-            console.log(`Category ID: ${result.data.category.id}`);
-            console.log(`Name: ${result.data.category.name}`);
-            console.log(`Description: ${result.data.category.description}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to retrieve category!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = ViewCategoryBoundary;
+module.exports = Platformmanager_viewcategoryBoundary;

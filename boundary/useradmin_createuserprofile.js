@@ -1,38 +1,51 @@
-const CreateUserProfileController = require('../controller/useradmin_createuserprofile');
+const useradmin_createuserprofile = require('../controller/useradmin_createuserprofile');
 
-class CreateUserProfileBoundary {
+class Useradmin_createuserprofileBoundary {
     constructor() {
-        this.controller = new CreateUserProfileController();
-    }
-    onClick() {
-        console.log('UseradminCreateuserprofileBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_createuserprofile();
     }
 
-    displayCreateUserProfileForm() {
-        console.log('=== Create User Profile ===');
-        console.log('Please enter the user profile details:');
+    handleCreateUserProfile(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.createUserProfile(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleCreateUserProfile(profileData) {
-        console.log('CreateUserProfileBoundary: Handling create user profile request...');
-        return this.controller.createUserProfile(profileData);
+    handleFormSubmission(formData) {
+        return this.handleCreateUserProfile(formData);
     }
-
-    displayCreateUserProfileResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for createuserprofile business logic
+        return {
+            firstName: uiData.firstName,
+            lastName: uiData.lastName,
+            userType: uiData.userType,
+            createdBy: uiData.userId,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ User profile created successfully!');
-            console.log(`Profile ID: ${result.data.profile.id}`);
-            console.log(`Name: ${result.data.profile.firstName} ${result.data.profile.lastName}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Failed to create user profile!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = CreateUserProfileBoundary;
+module.exports = Useradmin_createuserprofileBoundary;

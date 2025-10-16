@@ -1,38 +1,48 @@
-const UpdateUserAccountController = require('../controller/useradmin_updateuseraccount');
+const useradmin_updateuseraccount = require('../controller/useradmin_updateuseraccount');
 
-class UpdateUserAccountBoundary {
+class Useradmin_updateuseraccountBoundary {
     constructor() {
-        this.controller = new UpdateUserAccountController();
-    }
-    onClick() {
-        console.log('UseradminUpdateuseraccountBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_updateuseraccount();
     }
 
-    displayUpdateUserAccountForm() {
-        console.log('=== Update User Account ===');
-        console.log('Please enter the account ID and updated details:');
+    handleUpdateUserAccount(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.updateUserAccount(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleUpdateUserAccount(accountId, updateData) {
-        console.log('UpdateUserAccountBoundary: Handling update user account request...');
-        return this.controller.updateUserAccount(accountId, updateData);
+    handleFormSubmission(formData) {
+        return this.handleUpdateUserAccount(formData);
     }
-
-    displayUpdateUserAccountResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for updateuseraccount business logic
+        return {
+            ...uiData,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ User account updated successfully!');
-            console.log(`Account ID: ${result.data.account.id}`);
-            console.log(`Updated Username: ${result.data.account.username}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Failed to update user account!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = UpdateUserAccountBoundary;
+module.exports = Useradmin_updateuseraccountBoundary;

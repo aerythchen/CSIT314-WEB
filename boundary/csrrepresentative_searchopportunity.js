@@ -1,40 +1,49 @@
-const SearchOpportunityController = require('../controller/csrrepresentative_searchopportunity');
+const csrrepresentative_searchopportunity = require('../controller/csrrepresentative_searchopportunity');
 
-class SearchOpportunityBoundary {
+class Csrrepresentative_searchopportunityBoundary {
     constructor() {
-        this.controller = new SearchOpportunityController();
-    }
-    onClick() {
-        console.log('CsrrepresentativeSearchopportunityBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new csrrepresentative_searchopportunity();
     }
 
-    displaySearchOpportunityForm() {
-        console.log('=== Search Opportunity ===');
-        console.log('Please enter search criteria for opportunities:');
+    handleSearchOpportunity(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.searchOpportunity(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSearchOpportunity(searchCriteria) {
-        console.log('SearchOpportunityBoundary: Handling search opportunity...');
-        return this.controller.searchOpportunity(searchCriteria);
+    handleFormSubmission(formData) {
+        return this.handleSearchOpportunity(formData);
     }
-
-    displaySearchOpportunityResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for searchopportunity business logic
+        return {
+            ...uiData,
+            userType: 'csrrepresentative'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Search completed successfully!');
-            console.log(`Found ${result.data.opportunities.length} opportunities:`);
-            result.data.opportunities.forEach(opportunity => {
-                console.log(`- ${opportunity.title} (${opportunity.category})`);
-            });
+            return {
+                success: true,
+                message: result.message || 'Search completed successfully',
+                data: result.data, // Pass the data to server for rendering
+                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
+            };
         } else {
-            console.log('✗ Search failed!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SearchOpportunityBoundary;
+module.exports = Csrrepresentative_searchopportunityBoundary;

@@ -1,39 +1,48 @@
-const ViewOpportunityController = require('../controller/csrrepresentative_viewopportunity');
+const csrrepresentative_viewopportunity = require('../controller/csrrepresentative_viewopportunity');
 
-class ViewOpportunityBoundary {
+class Csrrepresentative_viewopportunityBoundary {
     constructor() {
-        this.controller = new ViewOpportunityController();
-    }
-    onClick() {
-        console.log('CsrrepresentativeViewopportunityBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new csrrepresentative_viewopportunity();
     }
 
-    displayViewOpportunityForm() {
-        console.log('=== View Opportunity ===');
-        console.log('Please enter the opportunity ID to view:');
+    handleViewOpportunity(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.viewOpportunity(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleViewOpportunity(opportunityId) {
-        console.log('ViewOpportunityBoundary: Handling view opportunity...');
-        return this.controller.viewOpportunity(opportunityId);
+    handleFormSubmission(formData) {
+        return this.handleViewOpportunity(formData);
     }
-
-    displayViewOpportunityResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for viewopportunity business logic
+        return {
+            ...uiData,
+            userType: 'csrrepresentative'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Opportunity retrieved successfully!');
-            console.log(`Opportunity ID: ${result.data.opportunity.id}`);
-            console.log(`Title: ${result.data.opportunity.title}`);
-            console.log(`Category: ${result.data.opportunity.category}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
+            };
         } else {
-            console.log('✗ Failed to retrieve opportunity!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = ViewOpportunityBoundary;
+module.exports = Csrrepresentative_viewopportunityBoundary;

@@ -1,39 +1,48 @@
-const ViewUserAccountController = require('../controller/useradmin_viewuseraccount');
+const useradmin_viewuseraccount = require('../controller/useradmin_viewuseraccount');
 
-class ViewUserAccountBoundary {
+class Useradmin_viewuseraccountBoundary {
     constructor() {
-        this.controller = new ViewUserAccountController();
-    }
-    onClick() {
-        console.log('UseradminViewuseraccountBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_viewuseraccount();
     }
 
-    displayViewUserAccountForm() {
-        console.log('=== View User Account ===');
-        console.log('Please enter the account ID to view:');
+    handleViewUserAccount(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.viewUserAccount(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleViewUserAccount(accountId) {
-        console.log('ViewUserAccountBoundary: Handling view user account request...');
-        return this.controller.viewUserAccount(accountId);
+    handleFormSubmission(formData) {
+        return this.handleViewUserAccount(formData);
     }
-
-    displayViewUserAccountResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for viewuseraccount business logic
+        return {
+            ...uiData,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ User account retrieved successfully!');
-            console.log(`Account ID: ${result.data.account.id}`);
-            console.log(`Username: ${result.data.account.username}`);
-            console.log(`Status: ${result.data.account.status}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Failed to retrieve user account!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = ViewUserAccountBoundary;
+module.exports = Useradmin_viewuseraccountBoundary;

@@ -1,40 +1,48 @@
-const SearchRequestController = require('../controller/personinneed_searchrequest');
+const personinneed_searchrequest = require('../controller/personinneed_searchrequest');
 
-class SearchRequestBoundary {
+class Personinneed_searchrequestBoundary {
     constructor() {
-        this.controller = new SearchRequestController();
-    }
-    onClick() {
-        console.log('PersoninneedSearchrequestBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_searchrequest();
     }
 
-    displaySearchRequestForm() {
-        console.log('=== Search Request ===');
-        console.log('Please enter search criteria:');
+    handleSearchRequest(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.searchRequest(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSearchRequest(searchCriteria) {
-        console.log('SearchRequestBoundary: Handling search request...');
-        return this.controller.searchRequest(searchCriteria);
+    handleFormSubmission(formData) {
+        return this.handleSearchRequest(formData);
     }
-
-    displaySearchRequestResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for searchrequest business logic
+        return {
+            ...uiData,
+            userType: 'personinneed'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Search completed successfully!');
-            console.log(`Found ${result.data.requests.length} requests:`);
-            result.data.requests.forEach(request => {
-                console.log(`- ${request.title} (${request.status})`);
-            });
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Search failed!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SearchRequestBoundary;
+module.exports = Personinneed_searchrequestBoundary;

@@ -1,39 +1,61 @@
-const LoginController = require('../controller/csrrepresentative_login');
+const csrrepresentative_login = require('../controller/csrrepresentative_login');
 
-class LoginBoundary {
+class Csrrepresentative_loginBoundary {
     constructor() {
-        this.controller = new LoginController();
+        this.controller = new csrrepresentative_login();
     }
 
-    onClick() {
-        console.log('LoginBoundary: User clicked login button');
-        this.displayLoginForm();
+    handleLogin(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.login(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    displayLoginForm() {
-        console.log('=== CSR Representative Login ===');
-        console.log('Please enter your credentials:');
+    handleFormSubmission(formData) {
+        return this.handleLogin(formData);
     }
-
-    handleLogin(email, password) {
-        console.log('LoginBoundary: Handling login submission...');
-        return this.controller.login(email, password);
+    
+    formatDataForController(uiData) {
+        // Format UI data for login business logic
+        return {
+            email: uiData.email,
+            password: uiData.password,
+            userType: 'csrrepresentative'
+        };
     }
-
-    displayLoginResult(result) {
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Login successful!');
-            console.log(`Welcome, ${result.data.user.firstName}!`);
+            // Pass through user data for session creation
+            const userData = result.data && result.data.user ? result.data.user : null;
+            
+            // Add display name if user data exists
+            if (userData && !userData.name) {
+                userData.name = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.email;
+            }
+            
+            return {
+                success: true,
+                message: result.message || 'Login successful',
+                data: {
+                    user: userData,
+                    session: result.data && result.data.session ? result.data.session : null
+                },
+                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
+            };
         } else {
-            console.log('✗ Login Failed!');
-            console.log(`Error: ${result.error}`);
-            console.log('[ Try Again ] [ Contact Support ]');
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = LoginBoundary;
+module.exports = Csrrepresentative_loginBoundary;

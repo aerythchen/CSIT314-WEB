@@ -1,34 +1,50 @@
-const CreateCategoryController = require('../controller/platformmanager_createcategory');
+const platformmanager_createcategory = require('../controller/platformmanager_createcategory');
 
-class CreateCategoryBoundary {
+class Platformmanager_createcategoryBoundary {
     constructor() {
-        this.controller = new CreateCategoryController();
+        this.controller = new platformmanager_createcategory();
     }
 
-    displayCreateCategoryForm() {
-        console.log('=== Create Category ===');
-        console.log('Please enter the category details:');
+    handleCreateCategory(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.createCategory(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleCreateCategory(categoryData) {
-        console.log('CreateCategoryBoundary: Handling create category...');
-        return this.controller.createCategory(categoryData);
+    handleFormSubmission(formData) {
+        return this.handleCreateCategory(formData);
     }
-
-    displayCreateCategoryResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for createcategory business logic
+        return {
+            categoryName: uiData.categoryName,
+            description: uiData.description,
+            createdBy: uiData.userId,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Category created successfully!');
-            console.log(`Category ID: ${result.data.category.id}`);
-            console.log(`Name: ${result.data.category.name}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to create category!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = CreateCategoryBoundary;
+module.exports = Platformmanager_createcategoryBoundary;

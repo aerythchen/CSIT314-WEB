@@ -1,41 +1,48 @@
-const ViewUserProfileController = require('../controller/useradmin_viewuserprofile');
+const useradmin_viewuserprofile = require('../controller/useradmin_viewuserprofile');
 
-class ViewUserProfileBoundary {
+class Useradmin_viewuserprofileBoundary {
     constructor() {
-        this.controller = new ViewUserProfileController();
-    }
-    onClick() {
-        console.log('UseradminViewuserprofileBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_viewuserprofile();
     }
 
-    displayViewUserProfileForm() {
-        console.log('=== View User Profile ===');
-        console.log('Please enter the profile ID to view:');
+    handleViewUserProfile(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.viewUserProfile(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleViewUserProfile(profileId) {
-        console.log('ViewUserProfileBoundary: Handling view user profile request...');
-        return this.controller.viewUserProfile(profileId);
+    handleFormSubmission(formData) {
+        return this.handleViewUserProfile(formData);
     }
-
-    displayViewUserProfileResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for viewuserprofile business logic
+        return {
+            ...uiData,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ User profile retrieved successfully!');
-            console.log(`Profile ID: ${result.data.profile.id}`);
-            console.log(`Name: ${result.data.profile.firstName} ${result.data.profile.lastName}`);
-            console.log(`Email: ${result.data.profile.email}`);
-            console.log(`User Type: ${result.data.profile.userType}`);
-            console.log(`Status: ${result.data.profile.status}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Failed to retrieve user profile!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = ViewUserProfileBoundary;
+module.exports = Useradmin_viewuserprofileBoundary;

@@ -1,38 +1,51 @@
-const CreateUserAccountController = require('../controller/useradmin_createuseraccount');
+const useradmin_createuseraccount = require('../controller/useradmin_createuseraccount');
 
-class CreateUserAccountBoundary {
+class Useradmin_createuseraccountBoundary {
     constructor() {
-        this.controller = new CreateUserAccountController();
-    }
-    onClick() {
-        console.log('UseradminCreateuseraccountBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_createuseraccount();
     }
 
-    displayCreateUserAccountForm() {
-        console.log('=== Create User Account ===');
-        console.log('Please enter the user account details:');
+    handleCreateUserAccount(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.createUserAccount(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleCreateUserAccount(accountData) {
-        console.log('CreateUserAccountBoundary: Handling create user account request...');
-        return this.controller.createUserAccount(accountData);
+    handleFormSubmission(formData) {
+        return this.handleCreateUserAccount(formData);
     }
-
-    displayCreateUserAccountResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for createuseraccount business logic
+        return {
+            username: uiData.username,
+            email: uiData.email,
+            password: uiData.password,
+            createdBy: uiData.userId,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ User account created successfully!');
-            console.log(`Account ID: ${result.data.account.id}`);
-            console.log(`Username: ${result.data.account.username}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Failed to create user account!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = CreateUserAccountBoundary;
+module.exports = Useradmin_createuseraccountBoundary;

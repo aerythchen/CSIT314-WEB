@@ -1,38 +1,48 @@
-const TrackShortlistController = require('../controller/personinneed_trackshortlist');
+const personinneed_trackshortlist = require('../controller/personinneed_trackshortlist');
 
-class TrackShortlistBoundary {
+class Personinneed_trackshortlistBoundary {
     constructor() {
-        this.controller = new TrackShortlistController();
-    }
-    onClick() {
-        console.log('PersoninneedTrackshortlistBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_trackshortlist();
     }
 
-    displayTrackShortlistForm() {
-        console.log('=== Track Shortlist ===');
-        console.log('Shortlist tracking information:');
+    handleTrackShortlist(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.trackShortlist(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleTrackShortlist(requestId) {
-        console.log('TrackShortlistBoundary: Handling track shortlist...');
-        return this.controller.trackShortlist(requestId);
+    handleFormSubmission(formData) {
+        return this.handleTrackShortlist(formData);
     }
-
-    displayTrackShortlistResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for trackshortlist business logic
+        return {
+            ...uiData,
+            userType: 'personinneed'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Shortlist tracking retrieved successfully!');
-            console.log(`Request ID: ${result.data.requestId}`);
-            console.log(`Shortlist Count: ${result.data.shortlistCount}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Failed to track shortlist!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = TrackShortlistBoundary;
+module.exports = Personinneed_trackshortlistBoundary;

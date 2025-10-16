@@ -1,39 +1,48 @@
-const ViewRequestController = require('../controller/personinneed_viewrequest');
+const personinneed_viewrequest = require('../controller/personinneed_viewrequest');
 
-class ViewRequestBoundary {
+class Personinneed_viewrequestBoundary {
     constructor() {
-        this.controller = new ViewRequestController();
-    }
-    onClick() {
-        console.log('PersoninneedViewrequestBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_viewrequest();
     }
 
-    displayViewRequestForm() {
-        console.log('=== View Request ===');
-        console.log('Please enter the request ID to view:');
+    handleViewRequest(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.viewRequest(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleViewRequest(requestId) {
-        console.log('ViewRequestBoundary: Handling view request...');
-        return this.controller.viewRequest(requestId);
+    handleFormSubmission(formData) {
+        return this.handleViewRequest(formData);
     }
-
-    displayViewRequestResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for viewrequest business logic
+        return {
+            ...uiData,
+            userType: 'personinneed'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Request retrieved successfully!');
-            console.log(`Request ID: ${result.data.request.id}`);
-            console.log(`Title: ${result.data.request.title}`);
-            console.log(`Status: ${result.data.request.status}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Failed to retrieve request!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = ViewRequestBoundary;
+module.exports = Personinneed_viewrequestBoundary;

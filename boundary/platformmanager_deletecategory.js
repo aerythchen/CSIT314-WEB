@@ -1,33 +1,48 @@
-const DeleteCategoryController = require('../controller/platformmanager_deletecategory');
+const platformmanager_deletecategory = require('../controller/platformmanager_deletecategory');
 
-class DeleteCategoryBoundary {
+class Platformmanager_deletecategoryBoundary {
     constructor() {
-        this.controller = new DeleteCategoryController();
+        this.controller = new platformmanager_deletecategory();
     }
 
-    displayDeleteCategoryForm() {
-        console.log('=== Delete Category ===');
-        console.log('Please enter the category ID to delete:');
+    handleDeleteCategory(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.deleteCategory(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleDeleteCategory(categoryId) {
-        console.log('DeleteCategoryBoundary: Handling delete category...');
-        return this.controller.deleteCategory(categoryId);
+    handleFormSubmission(formData) {
+        return this.handleDeleteCategory(formData);
     }
-
-    displayDeleteCategoryResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for deletecategory business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Category deleted successfully!');
-            console.log(`Category ID: ${result.data.categoryId} has been deleted`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to delete category!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = DeleteCategoryBoundary;
+module.exports = Platformmanager_deletecategoryBoundary;

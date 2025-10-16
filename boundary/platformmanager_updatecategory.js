@@ -1,34 +1,48 @@
-const UpdateCategoryController = require('../controller/platformmanager_updatecategory');
+const platformmanager_updatecategory = require('../controller/platformmanager_updatecategory');
 
-class UpdateCategoryBoundary {
+class Platformmanager_updatecategoryBoundary {
     constructor() {
-        this.controller = new UpdateCategoryController();
+        this.controller = new platformmanager_updatecategory();
     }
 
-    displayUpdateCategoryForm() {
-        console.log('=== Update Category ===');
-        console.log('Please enter the category ID and updated details:');
+    handleUpdateCategory(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.updateCategory(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleUpdateCategory(categoryId, updateData) {
-        console.log('UpdateCategoryBoundary: Handling update category...');
-        return this.controller.updateCategory(categoryId, updateData);
+    handleFormSubmission(formData) {
+        return this.handleUpdateCategory(formData);
     }
-
-    displayUpdateCategoryResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for updatecategory business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Category updated successfully!');
-            console.log(`Category ID: ${result.data.category.id}`);
-            console.log(`Updated Name: ${result.data.category.name}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to update category!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = UpdateCategoryBoundary;
+module.exports = Platformmanager_updatecategoryBoundary;

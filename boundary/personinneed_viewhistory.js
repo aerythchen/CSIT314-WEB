@@ -1,39 +1,48 @@
-const ViewHistoryController = require('../controller/personinneed_viewhistory');
+const personinneed_viewhistory = require('../controller/personinneed_viewhistory');
 
-class ViewHistoryBoundary {
+class Personinneed_viewhistoryBoundary {
     constructor() {
-        this.controller = new ViewHistoryController();
-    }
-    onClick() {
-        console.log('PersoninneedViewhistoryBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_viewhistory();
     }
 
-    displayViewHistoryForm() {
-        console.log('=== View History ===');
-        console.log('Displaying your request history:');
+    handleViewHistory(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.viewHistory(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleViewHistory(userId) {
-        console.log('ViewHistoryBoundary: Handling view history...');
-        return this.controller.viewHistory(userId);
+    handleFormSubmission(formData) {
+        return this.handleViewHistory(formData);
     }
-
-    displayViewHistoryResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for viewhistory business logic
+        return {
+            ...uiData,
+            userType: 'personinneed'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ History retrieved successfully!');
-            console.log(`Total requests: ${result.data.totalRequests}`);
-            console.log(`Total views: ${result.data.totalViews}`);
-            console.log(`Total shortlists: ${result.data.totalShortlists}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Failed to retrieve history!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = ViewHistoryBoundary;
+module.exports = Personinneed_viewhistoryBoundary;

@@ -1,35 +1,48 @@
-const GenerateMonthlyReportController = require('../controller/platformmanager_generatemonthlyreport');
+const platformmanager_generatemonthlyreport = require('../controller/platformmanager_generatemonthlyreport');
 
-class GenerateMonthlyReportBoundary {
+class Platformmanager_generatemonthlyreportBoundary {
     constructor() {
-        this.controller = new GenerateMonthlyReportController();
+        this.controller = new platformmanager_generatemonthlyreport();
     }
 
-    displayGenerateMonthlyReportForm() {
-        console.log('=== Generate Monthly Report ===');
-        console.log('Generating monthly report...');
+    handleGenerateMonthlyReport(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.generateMonthlyReport(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleGenerateMonthlyReport(month, year) {
-        console.log('GenerateMonthlyReportBoundary: Handling generate monthly report...');
-        return this.controller.generateMonthlyReport(month, year);
+    handleFormSubmission(formData) {
+        return this.handleGenerateMonthlyReport(formData);
     }
-
-    displayGenerateMonthlyReportResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for generatemonthlyreport business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Monthly report generated successfully!');
-            console.log(`Report ID: ${result.data.report.id}`);
-            console.log(`Month: ${result.data.report.month}/${result.data.report.year}`);
-            console.log(`Total Requests: ${result.data.report.totalRequests}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to generate monthly report!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = GenerateMonthlyReportBoundary;
+module.exports = Platformmanager_generatemonthlyreportBoundary;

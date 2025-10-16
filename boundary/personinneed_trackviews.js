@@ -1,38 +1,48 @@
-const TrackViewsController = require('../controller/personinneed_trackviews');
+const personinneed_trackviews = require('../controller/personinneed_trackviews');
 
-class TrackViewsBoundary {
+class Personinneed_trackviewsBoundary {
     constructor() {
-        this.controller = new TrackViewsController();
-    }
-    onClick() {
-        console.log('PersoninneedTrackviewsBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_trackviews();
     }
 
-    displayTrackViewsForm() {
-        console.log('=== Track Views ===');
-        console.log('View tracking information:');
+    handleTrackViews(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.trackViews(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleTrackViews(requestId) {
-        console.log('TrackViewsBoundary: Handling track views...');
-        return this.controller.trackViews(requestId);
+    handleFormSubmission(formData) {
+        return this.handleTrackViews(formData);
     }
-
-    displayTrackViewsResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for trackviews business logic
+        return {
+            ...uiData,
+            userType: 'personinneed'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ View tracking retrieved successfully!');
-            console.log(`Request ID: ${result.data.requestId}`);
-            console.log(`View Count: ${result.data.viewCount}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Failed to track views!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = TrackViewsBoundary;
+module.exports = Personinneed_trackviewsBoundary;

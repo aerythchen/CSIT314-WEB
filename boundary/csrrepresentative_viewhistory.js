@@ -1,29 +1,29 @@
-const csrrepresentative_viewshortlist = require('../controller/csrrepresentative_viewshortlist');
+const ViewHistoryController = require('../controller/csrrepresentative_viewhistory');
 
-class Csrrepresentative_viewshortlistBoundary {
+class Csrrepresentative_viewhistoryBoundary {
     constructor() {
-        this.controller = new csrrepresentative_viewshortlist();
+        this.controller = new ViewHistoryController();
     }
 
-    handleViewShortlist(data) {
+    handleViewHistory(data) {
         // 1. DATA FORMATTING (UI Logic)
         const formattedData = this.formatDataForController(data);
         
         // 2. CALL CONTROLLER
-        const result = this.controller.viewShortlist(formattedData);
+        const result = this.controller.viewHistory(formattedData);
         
         // 3. FORMAT RESPONSE FOR UI (UI Logic)
         return this.formatResponseForUI(result);
     }
 
     handleFormSubmission(formData) {
-        return this.handleViewShortlist(formData);
+        return this.handleViewHistory(formData);
     }
     
     formatDataForController(uiData) {
-        // Format UI data for viewshortlist business logic
+        // Format UI data for view history business logic
         return {
-            ...uiData,
+            userId: uiData.userId,
             userType: 'csrrepresentative'
         };
     }
@@ -33,8 +33,8 @@ class Csrrepresentative_viewshortlistBoundary {
         if (result.success) {
             return {
                 success: true,
-                message: result.message || 'Operation successful',
-                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
+                message: result.message || 'History retrieved successfully',
+                redirectUrl: '/csrrepresentative/dashboard'
             };
         } else {
             return {
@@ -45,4 +45,5 @@ class Csrrepresentative_viewshortlistBoundary {
     }
 }
 
-module.exports = Csrrepresentative_viewshortlistBoundary;
+module.exports = Csrrepresentative_viewhistoryBoundary;
+

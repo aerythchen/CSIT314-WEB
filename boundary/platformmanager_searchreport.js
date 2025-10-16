@@ -1,36 +1,48 @@
-const SearchReportController = require('../controller/platformmanager_searchreport');
+const platformmanager_searchreport = require('../controller/platformmanager_searchreport');
 
-class SearchReportBoundary {
+class Platformmanager_searchreportBoundary {
     constructor() {
-        this.controller = new SearchReportController();
+        this.controller = new platformmanager_searchreport();
     }
 
-    displaySearchReportForm() {
-        console.log('=== Search Report ===');
-        console.log('Please enter search criteria for reports:');
+    handleSearchReport(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.searchReport(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSearchReport(searchCriteria) {
-        console.log('SearchReportBoundary: Handling search report...');
-        return this.controller.searchReport(searchCriteria);
+    handleFormSubmission(formData) {
+        return this.handleSearchReport(formData);
     }
-
-    displaySearchReportResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for searchreport business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Report search completed successfully!');
-            console.log(`Found ${result.data.reports.length} reports:`);
-            result.data.reports.forEach(report => {
-                console.log(`- ${report.title} (${report.type})`);
-            });
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Report search failed!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SearchReportBoundary;
+module.exports = Platformmanager_searchreportBoundary;

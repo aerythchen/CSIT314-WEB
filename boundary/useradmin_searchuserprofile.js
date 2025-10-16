@@ -1,40 +1,48 @@
-const SearchUserProfileController = require('../controller/useradmin_searchuserprofile');
+const useradmin_searchuserprofile = require('../controller/useradmin_searchuserprofile');
 
-class SearchUserProfileBoundary {
+class Useradmin_searchuserprofileBoundary {
     constructor() {
-        this.controller = new SearchUserProfileController();
-    }
-    onClick() {
-        console.log('UseradminSearchuserprofileBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new useradmin_searchuserprofile();
     }
 
-    displaySearchUserProfileForm() {
-        console.log('=== Search User Profile ===');
-        console.log('Please enter search criteria:');
+    handleSearchUserProfile(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.searchUserProfile(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSearchUserProfile(searchCriteria) {
-        console.log('SearchUserProfileBoundary: Handling search user profile request...');
-        return this.controller.searchUserProfile(searchCriteria);
+    handleFormSubmission(formData) {
+        return this.handleSearchUserProfile(formData);
     }
-
-    displaySearchUserProfileResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for searchuserprofile business logic
+        return {
+            ...uiData,
+            userType: 'useradmin'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Search completed successfully!');
-            console.log(`Found ${result.data.profiles.length} profiles:`);
-            result.data.profiles.forEach(profile => {
-                console.log(`- ${profile.firstName} ${profile.lastName} (${profile.email}) - ${profile.userType}`);
-            });
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/useradmin/dashboard'
+            };
         } else {
-            console.log('✗ Search failed!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SearchUserProfileBoundary;
+module.exports = Useradmin_searchuserprofileBoundary;

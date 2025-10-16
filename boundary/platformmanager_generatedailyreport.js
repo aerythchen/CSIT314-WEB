@@ -1,35 +1,48 @@
-const GenerateDailyReportController = require('../controller/platformmanager_generatedailyreport');
+const platformmanager_generatedailyreport = require('../controller/platformmanager_generatedailyreport');
 
-class GenerateDailyReportBoundary {
+class Platformmanager_generatedailyreportBoundary {
     constructor() {
-        this.controller = new GenerateDailyReportController();
+        this.controller = new platformmanager_generatedailyreport();
     }
 
-    displayGenerateDailyReportForm() {
-        console.log('=== Generate Daily Report ===');
-        console.log('Generating daily report...');
+    handleGenerateDailyReport(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.generateDailyReport(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleGenerateDailyReport(date) {
-        console.log('GenerateDailyReportBoundary: Handling generate daily report...');
-        return this.controller.generateDailyReport(date);
+    handleFormSubmission(formData) {
+        return this.handleGenerateDailyReport(formData);
     }
-
-    displayGenerateDailyReportResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for generatedailyreport business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Daily report generated successfully!');
-            console.log(`Report ID: ${result.data.report.id}`);
-            console.log(`Date: ${result.data.report.date}`);
-            console.log(`Total Requests: ${result.data.report.totalRequests}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to generate daily report!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = GenerateDailyReportBoundary;
+module.exports = Platformmanager_generatedailyreportBoundary;

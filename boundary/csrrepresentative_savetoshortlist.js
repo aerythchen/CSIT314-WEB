@@ -1,38 +1,48 @@
-const SaveToShortlistController = require('../controller/csrrepresentative_savetoshortlist');
+const csrrepresentative_savetoshortlist = require('../controller/csrrepresentative_savetoshortlist');
 
-class SaveToShortlistBoundary {
+class Csrrepresentative_savetoshortlistBoundary {
     constructor() {
-        this.controller = new SaveToShortlistController();
-    }
-    onClick() {
-        console.log('CsrrepresentativeSavetoshortlistBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new csrrepresentative_savetoshortlist();
     }
 
-    displaySaveToShortlistForm() {
-        console.log('=== Save to Shortlist ===');
-        console.log('Please enter the opportunity ID to save:');
+    handleSaveToShortlist(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.saveToShortlist(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSaveToShortlist(opportunityId, userId) {
-        console.log('SaveToShortlistBoundary: Handling save to shortlist...');
-        return this.controller.saveToShortlist(opportunityId, userId);
+    handleFormSubmission(formData) {
+        return this.handleSaveToShortlist(formData);
     }
-
-    displaySaveToShortlistResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for savetoshortlist business logic
+        return {
+            ...uiData,
+            userType: 'csrrepresentative'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Opportunity saved to shortlist successfully!');
-            console.log(`Opportunity ID: ${result.data.opportunityId}`);
-            console.log(`Shortlist ID: ${result.data.shortlistId}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
+            };
         } else {
-            console.log('✗ Failed to save to shortlist!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SaveToShortlistBoundary;
+module.exports = Csrrepresentative_savetoshortlistBoundary;

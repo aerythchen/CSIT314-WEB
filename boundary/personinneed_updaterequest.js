@@ -1,38 +1,48 @@
-const UpdateRequestController = require('../controller/personinneed_updaterequest');
+const personinneed_updaterequest = require('../controller/personinneed_updaterequest');
 
-class UpdateRequestBoundary {
+class Personinneed_updaterequestBoundary {
     constructor() {
-        this.controller = new UpdateRequestController();
-    }
-    onClick() {
-        console.log('PersoninneedUpdaterequestBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new personinneed_updaterequest();
     }
 
-    displayUpdateRequestForm() {
-        console.log('=== Update Request ===');
-        console.log('Please enter the request ID and updated details:');
+    handleUpdateRequest(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.updateRequest(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleUpdateRequest(requestId, updateData) {
-        console.log('UpdateRequestBoundary: Handling update request...');
-        return this.controller.updateRequest(requestId, updateData);
+    handleFormSubmission(formData) {
+        return this.handleUpdateRequest(formData);
     }
-
-    displayUpdateRequestResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for updaterequest business logic
+        return {
+            ...uiData,
+            userType: 'personinneed'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Request updated successfully!');
-            console.log(`Request ID: ${result.data.request.id}`);
-            console.log(`Updated Title: ${result.data.request.title}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
+            };
         } else {
-            console.log('✗ Failed to update request!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = UpdateRequestBoundary;
+module.exports = Personinneed_updaterequestBoundary;

@@ -1,40 +1,48 @@
-const SearchShortlistController = require('../controller/csrrepresentative_searchshortlist');
+const csrrepresentative_searchshortlist = require('../controller/csrrepresentative_searchshortlist');
 
-class SearchShortlistBoundary {
+class Csrrepresentative_searchshortlistBoundary {
     constructor() {
-        this.controller = new SearchShortlistController();
-    }
-    onClick() {
-        console.log('CsrrepresentativeSearchshortlistBoundary: User clicked action button');
-        this.displayForm();
+        this.controller = new csrrepresentative_searchshortlist();
     }
 
-    displaySearchShortlistForm() {
-        console.log('=== Search Shortlist ===');
-        console.log('Please enter search criteria for shortlist:');
+    handleSearchShortlist(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.searchShortlist(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleSearchShortlist(searchCriteria) {
-        console.log('SearchShortlistBoundary: Handling search shortlist...');
-        return this.controller.searchShortlist(searchCriteria);
+    handleFormSubmission(formData) {
+        return this.handleSearchShortlist(formData);
     }
-
-    displaySearchShortlistResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for searchshortlist business logic
+        return {
+            ...uiData,
+            userType: 'csrrepresentative'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Shortlist search completed successfully!');
-            console.log(`Found ${result.data.shortlist.length} shortlist entries:`);
-            result.data.shortlist.forEach(entry => {
-                console.log(`- ${entry.opportunityTitle} (${entry.category})`);
-            });
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
+            };
         } else {
-            console.log('✗ Shortlist search failed!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = SearchShortlistBoundary;
+module.exports = Csrrepresentative_searchshortlistBoundary;

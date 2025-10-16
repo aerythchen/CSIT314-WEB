@@ -1,35 +1,48 @@
-const GenerateWeeklyReportController = require('../controller/platformmanager_generateweeklyreport');
+const platformmanager_generateweeklyreport = require('../controller/platformmanager_generateweeklyreport');
 
-class GenerateWeeklyReportBoundary {
+class Platformmanager_generateweeklyreportBoundary {
     constructor() {
-        this.controller = new GenerateWeeklyReportController();
+        this.controller = new platformmanager_generateweeklyreport();
     }
 
-    displayGenerateWeeklyReportForm() {
-        console.log('=== Generate Weekly Report ===');
-        console.log('Generating weekly report...');
+    handleGenerateWeeklyReport(data) {
+        // 1. DATA FORMATTING (UI Logic)
+        const formattedData = this.formatDataForController(data);
+        
+        // 2. CALL CONTROLLER
+        const result = this.controller.generateWeeklyReport(formattedData);
+        
+        // 3. FORMAT RESPONSE FOR UI (UI Logic)
+        return this.formatResponseForUI(result);
     }
 
-    handleGenerateWeeklyReport(weekNumber, year) {
-        console.log('GenerateWeeklyReportBoundary: Handling generate weekly report...');
-        return this.controller.generateWeeklyReport(weekNumber, year);
+    handleFormSubmission(formData) {
+        return this.handleGenerateWeeklyReport(formData);
     }
-
-    displayGenerateWeeklyReportResult(result) {
+    
+    formatDataForController(uiData) {
+        // Format UI data for generateweeklyreport business logic
+        return {
+            ...uiData,
+            userType: 'platformmanager'
+        };
+    }
+    
+    formatResponseForUI(result) {
+        // Simple response formatting for UI
         if (result.success) {
-            console.log('✓ Weekly report generated successfully!');
-            console.log(`Report ID: ${result.data.report.id}`);
-            console.log(`Week: ${result.data.report.weekNumber} of ${result.data.report.year}`);
-            console.log(`Total Requests: ${result.data.report.totalRequests}`);
+            return {
+                success: true,
+                message: result.message || 'Operation successful',
+                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+            };
         } else {
-            console.log('✗ Failed to generate weekly report!');
-            console.log(`Error: ${result.error}`);
+            return {
+                success: false,
+                error: result.error
+            };
         }
-    }
-
-    displayError(message) {
-        console.log(`Error: ${message}`);
     }
 }
 
-module.exports = GenerateWeeklyReportBoundary;
+module.exports = Platformmanager_generateweeklyreportBoundary;
