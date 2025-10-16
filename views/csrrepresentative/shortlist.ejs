@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Shortlist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <%- include('../partials/header', { title: 'My Shortlist', user: user }) %>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2><i class="fas fa-list"></i> My Shortlist</h2>
+                <p>Manage your shortlisted volunteering opportunities</p>
+                
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Shortlisted Opportunities</h5>
+                        <span class="badge bg-primary">3 items</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Urgency</th>
+                                        <th>Added Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Food assistance for family of 4</td>
+                                        <td><span class="badge bg-primary">Food Assistance</span></td>
+                                        <td><span class="badge bg-warning">High</span></td>
+                                        <td>2024-10-15</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Temporary housing needed</td>
+                                        <td><span class="badge bg-info">Housing Support</span></td>
+                                        <td><span class="badge bg-danger">Critical</span></td>
+                                        <td>2024-10-14</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Medical supplies for elderly</td>
+                                        <td><span class="badge bg-warning">Medical Aid</span></td>
+                                        <td><span class="badge bg-info">Medium</span></td>
+                                        <td>2024-10-13</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

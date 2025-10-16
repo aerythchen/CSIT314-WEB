@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSR Representative Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <%- include('../partials/header', { title: 'CSR Representative Dashboard', user: user }) %>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-handshake"></i> CSR Representative Dashboard</h2>
+                    <span class="badge bg-primary">Welcome, <%= user.firstName %>!</span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5><i class="fas fa-search"></i> Search Opportunities</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Find volunteering opportunities that match your company's CSR goals</p>
+                                <div class="d-grid gap-2">
+                                    <a href="/csrrepresentative/search-requests" class="btn btn-outline-primary">
+                                        <i class="fas fa-search"></i> Search Requests
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <h5><i class="fas fa-list"></i> My Shortlist</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Manage your shortlisted volunteering opportunities</p>
+                                <div class="d-grid gap-2">
+                                    <a href="/csrrepresentative/shortlist" class="btn btn-outline-success">
+                                        <i class="fas fa-list"></i> View Shortlist
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-pie"></i> Your Activity</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <div class="border rounded p-3">
+                                            <h3 class="text-primary">12</h3>
+                                            <p class="mb-0">Shortlisted</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border rounded p-3">
+                                            <h3 class="text-success">8</h3>
+                                            <p class="mb-0">Completed</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border rounded p-3">
+                                            <h3 class="text-warning">4</h3>
+                                            <p class="mb-0">In Progress</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border rounded p-3">
+                                            <h3 class="text-info">24</h3>
+                                            <p class="mb-0">Total Impact</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>
