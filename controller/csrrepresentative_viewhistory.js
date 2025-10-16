@@ -1,38 +1,41 @@
-const ViewHistoryEntity = require('../entity/csrrepresentative_viewhistory');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class ViewHistoryController {
     constructor() {
-        this.entity = new ViewHistoryEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    viewHistory(historyId, userId) {
-        console.log(`ViewHistoryController: Fetching history record ${historyId}...`);
+    viewHistory(data) {
+        const { userId } = data;
         
-        if (!historyId) {
+        console.log(`ViewHistoryController: Fetching all history for user ${userId}...`);
+        
+        if (!userId) {
             return {
                 success: false,
-                error: "History ID is required",
-                data: null
+                error: "User ID is required",
+                data: []
             };
         }
         
-        // Use Entity to fetch single history record
-        const entityResult = this.entity.process({
-            historyId: historyId,
-            userId: userId,
-            fetchSingle: true
-        });
+        // Use consolidated entity method directly
+        const result = this.entity.viewHistory();
         
-        if (!entityResult.success) {
+        if (!result.success) {
             return {
                 success: false,
-                error: entityResult.error,
-                data: null
+                error: result.error,
+                data: []
             };
         }
         
-        return this.processViewHistory(entityResult);
+        return {
+            success: true,
+            message: 'History retrieved successfully',
+            data: result.data,
+            count: result.count
+        };
     }
 
     getAllHistory(userId) {

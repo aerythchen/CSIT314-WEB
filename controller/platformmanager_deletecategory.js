@@ -1,12 +1,12 @@
-const DeleteCategoryEntity = require('../entity/platformmanager_deletecategory');
+const DeleteCategoryEntity = require('../entity/PlatformManager');
 
 class DeleteCategoryController {
     constructor() {
-        this.entity = new DeleteCategoryEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    deleteCategory(categoryId) {
+    deleteCategory(data) {
         console.log("DeleteCategoryController: Processing category deletion...");
         
         // Validate delete action

@@ -1,14 +1,16 @@
-const SearchShortlistEntity = require('../entity/csrrepresentative_searchshortlist');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class SearchShortlistController {
     constructor() {
-        this.entity = new SearchShortlistEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    searchShortlist(userId, searchTerm, category) {
+    searchShortlist(data) {
         console.log(`SearchShortlistController: Searching shortlist for user ${userId}...`);
         
+        
+        const { userId, searchTerm } = data;
         // Validate the search parameters
         const validationResult = this.validateShortlistSearch(userId, searchTerm, category);
         if (!validationResult.isValid) {

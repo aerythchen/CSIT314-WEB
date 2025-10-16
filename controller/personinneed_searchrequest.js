@@ -1,12 +1,12 @@
-const SearchRequestEntity = require('../entity/personinneed_searchrequest');
+const SearchRequestEntity = require('../entity/PersonInNeed');
 
 class SearchRequestController {
     constructor() {
-        this.entity = new SearchRequestEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    searchRequest(userId, searchTerm, status, dateRange) {
+    searchRequest(data) {
         console.log("SearchRequestController: Processing search request...");
         
         // Validate search criteria

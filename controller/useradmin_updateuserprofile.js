@@ -1,12 +1,12 @@
-const UpdateUserProfileEntity = require('../entity/useradmin_updateuserprofile');
+const UpdateUserProfileEntity = require('../entity/UserAdmin');
 
 class UpdateUserProfileController {
     constructor() {
-        this.entity = new UpdateUserProfileEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    updateUserProfile(userId, firstName, lastName, email) {
+    updateUserProfile(data) {
         console.log("UpdateUserProfileController: Processing profile update...");
         
         const validationResult = this.validateProfileUpdate(userId, firstName, lastName, email);

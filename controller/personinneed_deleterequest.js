@@ -1,12 +1,12 @@
-const DeleteRequestEntity = require('../entity/personinneed_deleterequest');
+const DeleteRequestEntity = require('../entity/PersonInNeed');
 
 class DeleteRequestController {
     constructor() {
-        this.entity = new DeleteRequestEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    deleteRequest(requestId, userId) {
+    deleteRequest(data) {
         console.log(`DeleteRequestController: Deleting request ${requestId}...`);
         
         // Validate delete action

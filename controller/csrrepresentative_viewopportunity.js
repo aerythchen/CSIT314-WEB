@@ -1,13 +1,13 @@
-const ViewOpportunityEntity = require('../entity/csrrepresentative_viewopportunity');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class ViewOpportunityController {
     constructor() {
-        this.entity = new ViewOpportunityEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    viewOpportunity(opportunityId) {
-        console.log(`ViewOpportunityController: Fetching opportunity ${opportunityId}...`);
+    viewOpportunity(data) {
+        const { opportunityId } = data;
         
         if (!opportunityId) {
             return {
@@ -17,55 +17,9 @@ class ViewOpportunityController {
             };
         }
         
-        // Use Entity to fetch and track view
-        const entityResult = this.entity.process({ opportunityId: opportunityId });
-        
-        return this.processViewRequest(entityResult);
-    }
-
-    getAllOpportunities() {
-        console.log("Fetching all available opportunities...");
-        
-        // Use Entity to fetch all opportunities
-        const entityResult = this.entity.process({ fetchAll: true });
-        
-        if (!entityResult.success) {
-            return {
-                success: false,
-                error: entityResult.error,
-                data: []
-            };
-        }
-        
-        const opportunitiesData = this.entity.getData();
-        
-        return {
-            success: true,
-            data: opportunitiesData.data,
-            count: opportunitiesData.data?.length || 0
-        };
-    }
-
-    processViewRequest(entityResult) {
-        console.log("Processing view request...");
-        
-        if (!entityResult || !entityResult.success) {
-            return {
-                success: false,
-                error: "Opportunity not found",
-                data: null
-            };
-        }
-        
-        // Get stored data from entity
-        const storedData = this.entity.getData();
-        
-        console.log("Opportunity viewed");
-        
-        return {
-            success: true,
-            data: storedData.data
-        };
+        // Use consolidated entity method directly
+        const result = this.entity.viewOpportunity(opportunityId);
+        return result;
     }
 }
 

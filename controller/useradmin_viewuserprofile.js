@@ -1,12 +1,12 @@
-const ViewUserProfileEntity = require('../entity/useradmin_viewuserprofile');
+const ViewUserProfileEntity = require('../entity/UserAdmin');
 
 class ViewUserProfileController {
     constructor() {
-        this.entity = new ViewUserProfileEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    viewUserProfile(userId) {
+    viewUserProfile(data) {
         console.log("ViewUserProfileController: Processing view profile request...");
         
         if (!userId || userId.trim() === "") {

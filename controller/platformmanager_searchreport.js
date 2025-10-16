@@ -1,12 +1,12 @@
-const SearchReportEntity = require('../entity/platformmanager_searchreport');
+const SearchReportEntity = require('../entity/PlatformManager');
 
 class SearchReportController {
     constructor() {
-        this.entity = new SearchReportEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    searchReport(searchTerm, reportType, dateFrom, dateTo) {
+    searchReport(data) {
         console.log("SearchReportController: Processing report search...");
         
         // Validate search criteria

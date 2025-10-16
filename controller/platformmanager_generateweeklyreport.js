@@ -1,12 +1,12 @@
-const GenerateWeeklyReportEntity = require('../entity/platformmanager_generateweeklyreport');
+const GenerateWeeklyReportEntity = require('../entity/PlatformManager');
 
 class GenerateWeeklyReportController {
     constructor() {
-        this.entity = new GenerateWeeklyReportEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    generateWeeklyReport(startDate, endDate) {
+    generateWeeklyReport(data) {
         console.log("GenerateWeeklyReportController: Processing weekly report generation...");
         
         // Validate report request

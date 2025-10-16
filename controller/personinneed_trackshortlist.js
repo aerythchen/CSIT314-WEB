@@ -1,12 +1,12 @@
-const TrackShortlistEntity = require('../entity/personinneed_trackshortlist');
+const TrackShortlistEntity = require('../entity/PersonInNeed');
 
 class TrackShortlistController {
     constructor() {
-        this.entity = new TrackShortlistEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    trackShortlist(requestId, userId) {
+    trackShortlist(data) {
         console.log(`TrackShortlistController: Tracking shortlist for request ${requestId}...`);
         
         if (!requestId || !userId) {

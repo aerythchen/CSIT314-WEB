@@ -1,13 +1,15 @@
-const CreateRequestEntity = require('../entity/personinneed_createrequest');
+const CreateRequestEntity = require('../entity/PersonInNeed');
 
 class CreateRequestController {
     constructor() {
-        this.entity = new CreateRequestEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    createRequest(title, description, category, urgency, userId) {
+    createRequest(data) {
         console.log("CreateRequestController: Processing request creation...");
+        
+        const { title, description, category, urgency, contact, createdBy, status } = data;
         
         // Validate request data
         const validationResult = this.validateRequestData(title, description, category, urgency);
@@ -20,7 +22,7 @@ class CreateRequestController {
         }
         
         // Process request creation
-        return this.processRequestCreation(title, description, category, urgency, userId);
+        return this.processRequestCreation(title, description, category, urgency, contact, createdBy, status);
     }
 
     validateRequestData(title, description, category, urgency) {
@@ -84,16 +86,18 @@ class CreateRequestController {
         return { isValid: true };
     }
 
-    processRequestCreation(title, description, category, urgency, userId) {
+    processRequestCreation(title, description, category, urgency, contact, createdBy, status) {
         console.log("Processing request creation...");
         
         // Use Entity to store request data
         const entityResult = this.entity.process({
-            userId: userId,
+            userId: createdBy,
             title: title.trim(),
             description: description.trim(),
             category: category,
-            urgency: urgency
+            urgency: urgency,
+            contact: contact,
+            status: status || 'pending'
         });
         
         if (!entityResult.success) {

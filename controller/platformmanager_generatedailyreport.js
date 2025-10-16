@@ -1,12 +1,12 @@
-const GenerateDailyReportEntity = require('../entity/platformmanager_generatedailyreport');
+const GenerateDailyReportEntity = require('../entity/PlatformManager');
 
 class GenerateDailyReportController {
     constructor() {
-        this.entity = new GenerateDailyReportEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    generateDailyReport(date) {
+    generateDailyReport(data) {
         console.log("GenerateDailyReportController: Processing daily report generation...");
         
         // Validate report request

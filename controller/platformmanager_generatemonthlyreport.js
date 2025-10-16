@@ -1,12 +1,12 @@
-const GenerateMonthlyReportEntity = require('../entity/platformmanager_generatemonthlyreport');
+const GenerateMonthlyReportEntity = require('../entity/PlatformManager');
 
 class GenerateMonthlyReportController {
     constructor() {
-        this.entity = new GenerateMonthlyReportEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    generateMonthlyReport(month, year) {
+    generateMonthlyReport(data) {
         console.log("GenerateMonthlyReportController: Processing monthly report generation...");
         
         // Validate report request

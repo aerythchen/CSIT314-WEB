@@ -1,12 +1,12 @@
-const CreateCategoryEntity = require('../entity/platformmanager_createcategory');
+const CreateCategoryEntity = require('../entity/PlatformManager');
 
 class CreateCategoryController {
     constructor() {
-        this.entity = new CreateCategoryEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    createCategory(name, description, status = "active") {
+    createCategory(data) {
         console.log("CreateCategoryController: Processing category creation...");
         
         // Validate category data

@@ -1,12 +1,12 @@
-const SuspendUserProfileEntity = require('../entity/useradmin_suspenduserprofile');
+const SuspendUserProfileEntity = require('../entity/UserAdmin');
 
 class SuspendUserProfileController {
     constructor() {
-        this.entity = new SuspendUserProfileEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    suspendUserProfile(userId, reason) {
+    suspendUserProfile(data) {
         console.log("SuspendUserProfileController: Processing profile suspension...");
         
         const validationResult = this.validateSuspendAction(userId, reason);

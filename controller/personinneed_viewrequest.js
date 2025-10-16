@@ -1,12 +1,12 @@
-const ViewRequestEntity = require('../entity/personinneed_viewrequest');
+const ViewRequestEntity = require('../entity/PersonInNeed');
 
 class ViewRequestController {
     constructor() {
-        this.entity = new ViewRequestEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    viewRequest(requestId) {
+    viewRequest(data) {
         console.log(`ViewRequestController: Fetching request ${requestId}...`);
         
         if (!requestId) {

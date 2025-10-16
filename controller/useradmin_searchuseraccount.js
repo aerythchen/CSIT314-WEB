@@ -1,12 +1,12 @@
-const SearchUserAccountEntity = require('../entity/useradmin_searchuseraccount');
+const SearchUserAccountEntity = require('../entity/UserAdmin');
 
 class SearchUserAccountController {
     constructor() {
-        this.entity = new SearchUserAccountEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    searchUserAccount(searchTerm, status) {
+    searchUserAccount(data) {
         console.log("SearchUserAccountController: Processing search request...");
         
         const validationResult = this.validateSearchCriteria(searchTerm, status);
@@ -21,7 +21,7 @@ class SearchUserAccountController {
         return this.processSearchRequest(searchTerm, status);
     }
 
-    searchUserAccounts(searchTerm, status) {
+    searchUserAccounts(data) {
         return this.searchUserAccount(searchTerm, status);
     }
 

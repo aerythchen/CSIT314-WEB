@@ -1,9 +1,9 @@
-const LogoutEntity = require('../entity/csrrepresentative_logout');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class LogoutController {
     constructor() {
-        this.entity = new LogoutEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
     logout(sessionId, userId) {

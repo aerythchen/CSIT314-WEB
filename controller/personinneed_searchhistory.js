@@ -1,12 +1,12 @@
-const SearchHistoryEntity = require('../entity/personinneed_searchhistory');
+const SearchHistoryEntity = require('../entity/PersonInNeed');
 
 class SearchHistoryController {
     constructor() {
-        this.entity = new SearchHistoryEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    searchHistory(userId, searchTerm, dateRange, serviceType) {
+    searchHistory(data) {
         console.log(`SearchHistoryController: Searching history for user ${userId}...`);
         
         // Validate search parameters

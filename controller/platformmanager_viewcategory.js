@@ -1,12 +1,12 @@
-const ViewCategoryEntity = require('../entity/platformmanager_viewcategory');
+const ViewCategoryEntity = require('../entity/PlatformManager');
 
 class ViewCategoryController {
     constructor() {
-        this.entity = new ViewCategoryEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    viewCategory(categoryId) {
+    viewCategory(data) {
         console.log("ViewCategoryController: Processing view category request...");
         
         // Validate category ID

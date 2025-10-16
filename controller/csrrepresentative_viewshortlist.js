@@ -1,14 +1,16 @@
-const ViewShortlistEntity = require('../entity/csrrepresentative_viewshortlist');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class ViewShortlistController {
     constructor() {
-        this.entity = new ViewShortlistEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    viewShortlist(userId) {
+    viewShortlist(data) {
         console.log(`ViewShortlistController: Fetching shortlist for user ${userId}...`);
         
+        
+        const { userId } = data;
         if (!userId) {
             return {
                 success: false,

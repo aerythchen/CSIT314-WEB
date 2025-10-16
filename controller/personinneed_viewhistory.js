@@ -1,12 +1,12 @@
-const ViewHistoryEntity = require('../entity/personinneed_viewhistory');
+const ViewHistoryEntity = require('../entity/PersonInNeed');
 
 class ViewHistoryController {
     constructor() {
-        this.entity = new ViewHistoryEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    viewHistory(historyId, userId) {
+    viewHistory(data) {
         console.log(`ViewHistoryController: Fetching history record ${historyId}...`);
         
         if (!historyId) {

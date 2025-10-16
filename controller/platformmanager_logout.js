@@ -1,8 +1,8 @@
-const LogoutEntity = require('../entity/platformmanager_logout');
+const LogoutEntity = require('../entity/PlatformManager');
 
 class LogoutController {
     constructor() {
-        this.entity = new LogoutEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 

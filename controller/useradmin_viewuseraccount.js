@@ -1,12 +1,12 @@
-const ViewUserAccountEntity = require('../entity/useradmin_viewuseraccount');
+const ViewUserAccountEntity = require('../entity/UserAdmin');
 
 class ViewUserAccountController {
     constructor() {
-        this.entity = new ViewUserAccountEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    viewUserAccount(accountId) {
+    viewUserAccount(data) {
         console.log("ViewUserAccountController: Processing view account request...");
         
         if (!accountId || accountId.trim() === "") {

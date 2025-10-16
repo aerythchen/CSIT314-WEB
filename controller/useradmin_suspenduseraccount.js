@@ -1,12 +1,12 @@
-const SuspendUserAccountEntity = require('../entity/useradmin_suspenduseraccount');
+const SuspendUserAccountEntity = require('../entity/UserAdmin');
 
 class SuspendUserAccountController {
     constructor() {
-        this.entity = new SuspendUserAccountEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    suspendUserAccount(accountId, reason) {
+    suspendUserAccount(data) {
         console.log("SuspendUserAccountController: Processing account suspension...");
         
         const validationResult = this.validateSuspendAction(accountId, reason);

@@ -1,14 +1,16 @@
-const SaveToShortlistEntity = require('../entity/csrrepresentative_savetoshortlist');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class SaveToShortlistController {
     constructor() {
-        this.entity = new SaveToShortlistEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    saveToShortlist(opportunityId, userId) {
+    saveToShortlist(data) {
         console.log(`SaveToShortlistController: Saving opportunity ${opportunityId} for user ${userId}...`);
         
+        
+        const { opportunityId, userId } = data;
         // Validate the save action
         const validationResult = this.validateSaveAction(opportunityId, userId);
         if (!validationResult.isValid) {
@@ -45,28 +47,22 @@ class SaveToShortlistController {
     processSaveAction(opportunityId, userId) {
         console.log(`Processing save action for opportunity ${opportunityId}...`);
         
-        // Use Entity to store shortlist item
-        const entityResult = this.entity.process({
-            userId: userId,
-            opportunityId: opportunityId
-        });
+        // Use consolidated entity method directly
+        const result = this.entity.saveToShortlist(userId, opportunityId);
         
-        if (!entityResult.success) {
+        if (!result.success) {
             return {
                 success: false,
-                error: entityResult.error
+                error: result.error
             };
         }
-        
-        // Get stored data
-        const shortlistData = this.entity.getData();
         
         console.log("Opportunity saved to shortlist successfully");
         
         return {
             success: true,
             message: "Opportunity added to shortlist",
-            data: shortlistData.data
+            data: result.data
         };
     }
 }

@@ -1,12 +1,12 @@
-const CreateUserProfileEntity = require('../entity/useradmin_createuserprofile');
+const CreateUserProfileEntity = require('../entity/UserAdmin');
 
 class CreateUserProfileController {
     constructor() {
-        this.entity = new CreateUserProfileEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    createUserProfile(firstName, lastName, email, userType) {
+    createUserProfile(data) {
         console.log("CreateUserProfileController: Processing profile creation...");
         
         const validationResult = this.validateUserProfile(firstName, lastName, email, userType);

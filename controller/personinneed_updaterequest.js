@@ -1,12 +1,12 @@
-const UpdateRequestEntity = require('../entity/personinneed_updaterequest');
+const UpdateRequestEntity = require('../entity/PersonInNeed');
 
 class UpdateRequestController {
     constructor() {
-        this.entity = new UpdateRequestEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    updateRequest(requestId, title, description, status) {
+    updateRequest(data) {
         console.log(`UpdateRequestController: Updating request ${requestId}...`);
         
         // Validate update data

@@ -1,16 +1,18 @@
-const SearchOpportunityEntity = require('../entity/csrrepresentative_searchopportunity');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class SearchOpportunityController {
     constructor() {
-        this.entity = new SearchOpportunityEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    searchOpportunity(searchTerm, category, location) {
+    searchOpportunity(data) {
         console.log("SearchOpportunityController: Processing search request...");
         
+        const { searchTerm, category, urgency, userId } = data;
+        
         // Validate search criteria
-        const validationResult = this.validateSearchCriteria(searchTerm, category, location);
+        const validationResult = this.validateSearchCriteria(searchTerm, category, urgency);
         if (!validationResult.isValid) {
             return {
                 success: false,
@@ -20,21 +22,14 @@ class SearchOpportunityController {
         }
         
         // Process the search request
-        return this.processSearchRequest(searchTerm, category, location);
+        return this.processSearchRequest(searchTerm, category, urgency, userId);
     }
 
-    validateSearchCriteria(searchTerm, category, location) {
+    validateSearchCriteria(searchTerm, category, urgency) {
         console.log("Validating search criteria...");
         
-        // At least one search criterion must be provided
-        if (!searchTerm && !category && !location) {
-            return {
-                isValid: false,
-                error: "Please provide at least one search criterion"
-            };
-        }
-        
-        // Validate search term length if provided
+        // Allow empty criteria for "View All" functionality
+        // Only validate search term length if provided
         if (searchTerm && searchTerm.trim().length < 2) {
             return {
                 isValid: false,
@@ -45,31 +40,24 @@ class SearchOpportunityController {
         return { isValid: true };
     }
 
-    processSearchRequest(searchTerm, category, location) {
-        console.log("Processing search with filters:", { searchTerm, category, location });
+    processSearchRequest(searchTerm, category, urgency, userId) {
+        console.log("Processing search with filters:", { searchTerm, category, urgency });
         
-        // Use Entity to search opportunities
-        const entityResult = this.entity.process({
-            searchTerm: searchTerm,
-            category: category,
-            location: location
-        });
+        // Use consolidated entity method directly
+        const result = this.entity.searchOpportunities(searchTerm, category, urgency);
         
-        if (!entityResult.success) {
+        if (!result.success) {
             return {
                 success: false,
-                error: entityResult.error,
+                error: result.error,
                 results: []
             };
         }
         
-        // Get stored data from entity
-        const searchData = this.entity.getData();
-        
         return {
             success: true,
-            results: searchData.data.results,
-            count: searchData.data.resultCount
+            data: result.data,
+            count: result.count
         };
     }
 }

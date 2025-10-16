@@ -1,8 +1,8 @@
-const LogoutEntity = require('../entity/personinneed_logout');
+const LogoutEntity = require('../entity/PersonInNeed');
 
 class LogoutController {
     constructor() {
-        this.entity = new LogoutEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 

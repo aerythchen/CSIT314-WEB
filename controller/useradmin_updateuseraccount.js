@@ -1,12 +1,12 @@
-const UpdateUserAccountEntity = require('../entity/useradmin_updateuseraccount');
+const UpdateUserAccountEntity = require('../entity/UserAdmin');
 
 class UpdateUserAccountController {
     constructor() {
-        this.entity = new UpdateUserAccountEntity();
+        this.entity = new UserAdmin();
         this.entity.initialize();
     }
 
-    updateUserAccount(accountId, username, status) {
+    updateUserAccount(data) {
         console.log("UpdateUserAccountController: Processing account update...");
         
         const validationResult = this.validateAccountUpdate(accountId, username, status);

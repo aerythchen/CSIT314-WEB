@@ -1,12 +1,12 @@
-const TrackViewsEntity = require('../entity/personinneed_trackviews');
+const TrackViewsEntity = require('../entity/PersonInNeed');
 
 class TrackViewsController {
     constructor() {
-        this.entity = new TrackViewsEntity();
+        this.entity = new PersonInNeed();
         this.entity.initialize();
     }
 
-    trackViews(requestId, userId) {
+    trackViews(data) {
         console.log(`TrackViewsController: Tracking views for request ${requestId}...`);
         
         if (!requestId || !userId) {

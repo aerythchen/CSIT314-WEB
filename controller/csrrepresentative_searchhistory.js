@@ -1,16 +1,21 @@
-const SearchHistoryEntity = require('../entity/csrrepresentative_searchhistory');
+const CSRRepresentative = require('../entity/CSRRepresentative');
 
 class SearchHistoryController {
     constructor() {
-        this.entity = new SearchHistoryEntity();
-        this.entity.initialize();
+        this.entity = new CSRRepresentative();
+        // Entity ready to use
     }
 
-    searchHistory(userId, searchTerm, dateRange, serviceType) {
+    searchHistory(data) {
+        const { userId, serviceType, startDate, endDate } = data;
+        
         console.log(`SearchHistoryController: Searching history for user ${userId}...`);
         
+        // Create date range object
+        const dateRange = (startDate || endDate) ? { from: startDate, to: endDate } : null;
+        
         // Validate search parameters
-        const validationResult = this.validateHistorySearch(userId, searchTerm, dateRange, serviceType);
+        const validationResult = this.validateHistorySearch(userId, dateRange, serviceType);
         if (!validationResult.isValid) {
             return {
                 success: false,
@@ -20,10 +25,10 @@ class SearchHistoryController {
         }
         
         // Process the search
-        return this.processHistorySearch(userId, searchTerm, dateRange, serviceType);
+        return this.processHistorySearch(userId, dateRange, serviceType);
     }
 
-    validateHistorySearch(userId, searchTerm, dateRange, serviceType) {
+    validateHistorySearch(userId, dateRange, serviceType) {
         console.log("Validating history search parameters...");
         
         if (!userId) {
@@ -51,32 +56,24 @@ class SearchHistoryController {
         return { isValid: true };
     }
 
-    processHistorySearch(userId, searchTerm, dateRange, serviceType) {
+    processHistorySearch(userId, dateRange, serviceType) {
         console.log("Processing history search...");
         
-        // Use Entity to search history
-        const entityResult = this.entity.process({
-            userId: userId,
-            searchTerm: searchTerm,
-            dateRange: dateRange,
-            serviceType: serviceType
-        });
+        // Use consolidated entity method directly
+        const result = this.entity.searchHistory(serviceType, dateRange?.from, dateRange?.to);
         
-        if (!entityResult.success) {
+        if (!result.success) {
             return {
                 success: false,
-                error: entityResult.error,
+                error: result.error,
                 results: []
             };
         }
         
-        // Get stored data
-        const searchData = this.entity.getData();
-        
         return {
             success: true,
-            results: searchData.data.results,
-            count: searchData.data.resultCount
+            data: result.data,
+            count: result.count
         };
     }
 }

@@ -1,12 +1,12 @@
-const UpdateCategoryEntity = require('../entity/platformmanager_updatecategory');
+const UpdateCategoryEntity = require('../entity/PlatformManager');
 
 class UpdateCategoryController {
     constructor() {
-        this.entity = new UpdateCategoryEntity();
+        this.entity = new PlatformManager();
         this.entity.initialize();
     }
 
-    updateCategory(categoryId, name, description, status) {
+    updateCategory(data) {
         console.log("UpdateCategoryController: Processing category update...");
         
         // Validate update data
