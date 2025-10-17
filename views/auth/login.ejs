@@ -24,7 +24,13 @@
                             </div>
                         <% } %>
                         
-                        <form method="POST" action="/auth/login">
+                        <% if (success) { %>
+                            <div class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle"></i> <%= success %>
+                            </div>
+                        <% } %>
+                        
+                        <form method="POST" action="/bce/personinneed_login/login" id="loginForm">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email Address</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
@@ -37,7 +43,7 @@
                             
                             <div class="mb-3">
                                 <label for="userType" class="form-label">User Type</label>
-                                <select class="form-select" id="userType" name="userType" required>
+                                <select class="form-select" id="userType" name="userType" required onchange="updateFormAction()">
                                     <option value="">Select your role</option>
                                     <option value="useradmin">User Administrator</option>
                                     <option value="platformmanager">Platform Manager</option>
@@ -52,6 +58,30 @@
                                 </button>
                             </div>
                         </form>
+                        
+                        <script>
+                            function updateFormAction() {
+                                const userType = document.getElementById('userType').value;
+                                const form = document.getElementById('loginForm');
+                                
+                                switch(userType) {
+                                    case 'personinneed':
+                                        form.action = '/bce/personinneed_login/login';
+                                        break;
+                                    case 'csrrepresentative':
+                                        form.action = '/bce/csrrepresentative_login/login';
+                                        break;
+                                    case 'platformmanager':
+                                        form.action = '/bce/platformmanager_login/login';
+                                        break;
+                                    case 'useradmin':
+                                        form.action = '/bce/useradmin_login/login';
+                                        break;
+                                    default:
+                                        form.action = '/bce/personinneed_login/login';
+                                }
+                            }
+                        </script>
                     </div>
                     <div class="card-footer bg-light">
                         <h6 class="text-muted mb-2">Test Accounts:</h6>

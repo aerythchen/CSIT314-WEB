@@ -1,7 +1,7 @@
 const InMemoryDB = require('./InMemoryDB');
 const models = require('./models');
 const seedData = require('./seedData');
-const { UserProfileHelpers, UserAccountHelpers, CategoryHelpers, RequestHelpers, ShortlistHelpers, SessionHelpers } = require('./helpers');
+const { UserProfileHelpers, UserAccountHelpers, CategoryHelpers, RequestHelpers, ShortlistHelpers, SessionHelpers, MatchHelpers } = require('./helpers');
 
 const db = new InMemoryDB();
 
@@ -20,5 +20,6 @@ module.exports = {
     CategoryHelpers,
     RequestHelpers,
     ShortlistHelpers,
-    SessionHelpers
+    SessionHelpers,
+    MatchHelpers
 };

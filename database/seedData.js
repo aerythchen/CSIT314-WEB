@@ -1,25 +1,25 @@
 const seedData = (db) => {
     console.log('🌱 Seeding database...');
     
-    // User Profiles
-    const profile1 = db.insert('userProfiles', { id: 'profile_pin_001', firstName: 'Emma', lastName: 'Johnson', email: 'emma.johnson@email.com', userType: 'personinneed', status: 'active' }).data;
-    const profile2 = db.insert('userProfiles', { id: 'profile_csr_001', firstName: 'Carol', lastName: 'Williams', email: 'carol.williams@company.com', userType: 'csrrepresentative', status: 'active' }).data;
-    const profile3 = db.insert('userProfiles', { id: 'profile_pm_001', firstName: 'Alice', lastName: 'Manager', email: 'alice.manager@csrplatform.com', userType: 'platformmanager', status: 'active' }).data;
-    const profile4 = db.insert('userProfiles', { id: 'profile_ua_001', firstName: 'Bob', lastName: 'Admin', email: 'bob.admin@csrplatform.com', userType: 'useradmin', status: 'active' }).data;
-    const profile5 = db.insert('userProfiles', { id: 'profile_pin_002', firstName: 'John', lastName: 'Smith', email: 'john.smith@email.com', userType: 'personinneed', status: 'active' }).data;
-    const profile6 = db.insert('userProfiles', { id: 'profile_csr_002', firstName: 'David', lastName: 'Brown', email: 'david.brown@company.com', userType: 'csrrepresentative', status: 'active' }).data;
-    const profile7 = db.insert('userProfiles', { id: 'profile_pin_003', firstName: 'Sarah', lastName: 'Davis', email: 'sarah.davis@email.com', userType: 'personinneed', status: 'active' }).data;
+    // User Profiles (with passwords for demo purposes - all use "password123")
+    const profile1 = db.insert('userProfiles', { id: 'profile_pin_001', firstName: 'Emma', lastName: 'Johnson', email: 'emma.johnson@email.com', userType: 'personinneed', status: 'active', password: 'password123' }).data;
+    const profile2 = db.insert('userProfiles', { id: 'profile_csr_001', firstName: 'Carol', lastName: 'Williams', email: 'carol.williams@company.com', userType: 'csrrepresentative', status: 'active', password: 'password123' }).data;
+    const profile3 = db.insert('userProfiles', { id: 'profile_pm_001', firstName: 'Alice', lastName: 'Manager', email: 'alice.manager@csrplatform.com', userType: 'platformmanager', status: 'active', password: 'password123' }).data;
+    const profile4 = db.insert('userProfiles', { id: 'profile_ua_001', firstName: 'Bob', lastName: 'Admin', email: 'bob.admin@csrplatform.com', userType: 'useradmin', status: 'active', password: 'password123' }).data;
+    const profile5 = db.insert('userProfiles', { id: 'profile_pin_002', firstName: 'John', lastName: 'Smith', email: 'john.smith@email.com', userType: 'personinneed', status: 'active', password: 'password123' }).data;
+    const profile6 = db.insert('userProfiles', { id: 'profile_csr_002', firstName: 'David', lastName: 'Brown', email: 'david.brown@company.com', userType: 'csrrepresentative', status: 'active', password: 'password123' }).data;
+    const profile7 = db.insert('userProfiles', { id: 'profile_pin_003', firstName: 'Sarah', lastName: 'Davis', email: 'sarah.davis@email.com', userType: 'personinneed', status: 'active', password: 'password123' }).data;
     
     console.log('✓ Created 7 user profiles');
     
     // User Accounts
-    const account1 = db.insert('userAccounts', { id: 'account_pin_001', profileId: profile1.id, username: 'emma_j', passwordHash: 'hashed_password_1', status: 'active' }).data;
-    const account2 = db.insert('userAccounts', { id: 'account_csr_001', profileId: profile2.id, username: 'carol_w', passwordHash: 'hashed_password_2', status: 'active' }).data;
-    const account3 = db.insert('userAccounts', { id: 'account_pm_001', profileId: profile3.id, username: 'alice_m', passwordHash: 'hashed_password_3', status: 'active' }).data;
-    const account4 = db.insert('userAccounts', { id: 'account_ua_001', profileId: profile4.id, username: 'bob_a', passwordHash: 'hashed_password_4', status: 'active' }).data;
-    const account5 = db.insert('userAccounts', { id: 'account_pin_002', profileId: profile5.id, username: 'john_s', passwordHash: 'hashed_password_5', status: 'active' }).data;
-    const account6 = db.insert('userAccounts', { id: 'account_csr_002', profileId: profile6.id, username: 'david_b', passwordHash: 'hashed_password_6', status: 'active' }).data;
-    const account7 = db.insert('userAccounts', { id: 'account_pin_003', profileId: profile7.id, username: 'sarah_d', passwordHash: 'hashed_password_7', status: 'active' }).data;
+    const account1 = db.insert('userAccounts', { id: 'account_pin_001', profileId: profile1.id, username: 'emma_j', passwordHash: 'password123', status: 'active' }).data;
+    const account2 = db.insert('userAccounts', { id: 'account_csr_001', profileId: profile2.id, username: 'carol_w', passwordHash: 'password123', status: 'active' }).data;
+    const account3 = db.insert('userAccounts', { id: 'account_pm_001', profileId: profile3.id, username: 'alice_m', passwordHash: 'password123', status: 'active' }).data;
+    const account4 = db.insert('userAccounts', { id: 'account_ua_001', profileId: profile4.id, username: 'bob_a', passwordHash: 'password123', status: 'active' }).data;
+    const account5 = db.insert('userAccounts', { id: 'account_pin_002', profileId: profile5.id, username: 'john_s', passwordHash: 'password123', status: 'active' }).data;
+    const account6 = db.insert('userAccounts', { id: 'account_csr_002', profileId: profile6.id, username: 'david_b', passwordHash: 'password123', status: 'active' }).data;
+    const account7 = db.insert('userAccounts', { id: 'account_pin_003', profileId: profile7.id, username: 'sarah_d', passwordHash: 'password123', status: 'active' }).data;
     
     console.log('✓ Created 7 user accounts');
     
@@ -55,6 +55,30 @@ const seedData = (db) => {
     db.update('categories', category5.id, { requestCount: db.find('requests', { categoryId: category5.id }).length });
     
     console.log('✓ Updated category counts');
+    
+    // Matches (completed volunteer work)
+    const match1 = db.insert('matches', { 
+        id: 'match_001', 
+        requestId: request1.id, 
+        csrId: profile2.id, 
+        serviceType: 'Food Assistance', 
+        status: 'completed', 
+        completedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+        notes: 'Successfully delivered groceries to family'
+    }).data;
+    
+    const match2 = db.insert('matches', { 
+        id: 'match_002', 
+        requestId: request3.id, 
+        csrId: profile6.id, 
+        serviceType: 'Medical Aid', 
+        status: 'completed', 
+        completedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+        notes: 'Provided medical supplies and assistance'
+    }).data;
+    
+    console.log('✓ Created 2 completed matches');
+    
     console.log('🎉 Database seeded successfully!');
     
     // Log statistics
@@ -63,7 +87,8 @@ const seedData = (db) => {
         userAccounts: db.count('userAccounts', { isDeleted: false }),
         categories: db.count('categories', { isDeleted: false }),
         requests: db.count('requests', { isDeleted: false }),
-        shortlists: db.count('shortlists', { isDeleted: false })
+        shortlists: db.count('shortlists', { isDeleted: false }),
+        matches: db.count('matches', { isDeleted: false })
     });
 };
 

@@ -14,80 +14,217 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="fas fa-handshake"></i> CSR Representative Dashboard</h2>
-                    <span class="badge bg-primary">Welcome, <%= user.firstName %>!</span>
-                </div>
+                <h2><i class="fas fa-user-tie"></i> Welcome, <%= user.name %></h2>
+                <p>Manage opportunities and help those in need</p>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-primary text-white">
-                                <h5><i class="fas fa-search"></i> Search Opportunities</h5>
-                            </div>
+                <% if (error) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                    </div>
+                <% } %>
+                
+                <% if (success) { %>
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i> <%= success %>
+                    </div>
+                <% } %>
+                
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
                             <div class="card-body">
-                                <p>Find volunteering opportunities that match your company's CSR goals</p>
-                                <div class="d-grid gap-2">
-                                    <a href="/csrrepresentative/search-requests" class="btn btn-outline-primary">
-                                        <i class="fas fa-search"></i> Search Requests
-                                    </a>
-                                </div>
+                                <i class="fas fa-list fa-3x text-primary mb-3"></i>
+                                <h5>View All Requests</h5>
+                                <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <input type="hidden" name="searchTerm" value="">
+                                    <input type="hidden" name="category" value="">
+                                    <input type="hidden" name="urgency" value="">
+                                    <button type="submit" class="btn btn-primary">View All</button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-success text-white">
-                                <h5><i class="fas fa-list"></i> My Shortlist</h5>
-                            </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
                             <div class="card-body">
-                                <p>Manage your shortlisted volunteering opportunities</p>
-                                <div class="d-grid gap-2">
-                                    <a href="/csrrepresentative/shortlist" class="btn btn-outline-success">
-                                        <i class="fas fa-list"></i> View Shortlist
-                                    </a>
-                                </div>
+                                <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                                <h5>My Shortlist</h5>
+                                <a href="#shortlist-section" class="btn btn-warning">View Shortlist</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-eye fa-3x text-info mb-3"></i>
+                                <h5>View Opportunities</h5>
+                                <a href="#view-section" class="btn btn-info">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-cog fa-3x text-success mb-3"></i>
+                                <h5>Manage</h5>
+                                <a href="#manage-section" class="btn btn-success">Manage</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-chart-pie"></i> Your Activity</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row text-center">
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-primary">12</h3>
-                                            <p class="mb-0">Shortlisted</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-success">8</h3>
-                                            <p class="mb-0">Completed</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-warning">4</h3>
-                                            <p class="mb-0">In Progress</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-info">24</h3>
-                                            <p class="mb-0">Total Impact</p>
-                                        </div>
-                                    </div>
+                <!-- Search Opportunities Section -->
+                <div class="card mb-4" id="search-section">
+                    <div class="card-header">
+                        <h5><i class="fas fa-search"></i> Search Opportunities</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST">
+                            <input type="hidden" name="userId" value="<%= user.id %>">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="searchTerm" class="form-label">Search Term</label>
+                                    <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Search opportunities">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category" name="category">
+                                        <option value="">All Categories</option>
+                                        <option value="food">Food Assistance</option>
+                                        <option value="housing">Housing Support</option>
+                                        <option value="medical">Medical Aid</option>
+                                        <option value="education">Education</option>
+                                        <option value="emergency">Emergency Relief</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="urgency" class="form-label">Urgency</label>
+                                    <select class="form-select" id="urgency" name="urgency">
+                                        <option value="">All Urgency</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
                                 </div>
                             </div>
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Search Opportunities
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Opportunities List -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Available Opportunities</h5>
+                        <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST" class="d-inline">
+                            <input type="hidden" name="userId" value="<%= user.id %>">
+                            <input type="hidden" name="searchTerm" value="">
+                            <input type="hidden" name="category" value="">
+                            <input type="hidden" name="urgency" value="">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-refresh"></i> Refresh
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Click "View All Requests" above to see all available opportunities, or use the search form to filter results.
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Shortlist Management Section -->
+                <div class="card mb-4" id="shortlist-section">
+                    <div class="card-header">
+                        <h5><i class="fas fa-star"></i> My Shortlist</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <form action="/bce/csrrepresentative_searchshortlist/searchShortlist" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="searchTerm" placeholder="Search shortlist">
+                                        <button type="submit" class="btn btn-outline-secondary">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <form action="/bce/csrrepresentative_viewshortlist/viewShortlist" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-list"></i> View All Shortlist
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Use the "View All Shortlist" button above to see your saved opportunities.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Match History Section -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history"></i> Match History
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- View All History -->
+                        <form action="/bce/csrrepresentative_viewhistory/viewHistory" method="POST" class="mb-4">
+                            <input type="hidden" name="userId" value="<%= user.id %>">
+                            <button type="submit" class="btn btn-info w-100">
+                                <i class="fas fa-list"></i> View All Match History
+                            </button>
+                        </form>
+
+                        <hr>
+
+                        <!-- Search History -->
+                        <h6 class="mb-3">Search History</h6>
+                        <form action="/bce/csrrepresentative_searchhistory/searchHistory" method="POST">
+                            <input type="hidden" name="userId" value="<%= user.id %>">
+                            <div class="mb-3">
+                                <label for="serviceType" class="form-label">Service Type</label>
+                                <select class="form-select" id="serviceType" name="serviceType">
+                                    <option value="">All Types</option>
+                                    <option value="food">Food Assistance</option>
+                                    <option value="housing">Housing Support</option>
+                                    <option value="medical">Medical Aid</option>
+                                    <option value="education">Education</option>
+                                    <option value="emergency">Emergency Relief</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="startDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="endDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Search History
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

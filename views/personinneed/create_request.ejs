@@ -16,20 +16,33 @@
                 <h2><i class="fas fa-plus"></i> Create New Request</h2>
                 <p>Submit a new assistance request</p>
                 
+                <% if (error) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                    </div>
+                <% } %>
+                
+                <% if (success) { %>
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i> <%= success %>
+                    </div>
+                <% } %>
+                
                 <div class="card">
                     <div class="card-header">
                         <h5><i class="fas fa-edit"></i> Request Details</h5>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <form id="createRequestForm" action="/bce/personinneed_createrequest/createRequest" method="POST">
+                            <input type="hidden" name="userId" value="<%= user.id %>">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="title" class="form-label">Request Title *</label>
-                                    <input type="text" class="form-control" id="title" required>
+                                    <input type="text" class="form-control" id="title" name="title" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="category" class="form-label">Category *</label>
-                                    <select class="form-select" id="category" required>
+                                    <select class="form-select" id="category" name="category" required>
                                         <option value="">Select a category</option>
                                         <option value="food">Food Assistance</option>
                                         <option value="housing">Housing Support</option>
@@ -42,13 +55,13 @@
                             
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description *</label>
-                                <textarea class="form-control" id="description" rows="4" required placeholder="Please provide detailed information about your request..."></textarea>
+                                <textarea class="form-control" id="description" name="description" rows="4" required placeholder="Please provide detailed information about your request..."></textarea>
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="urgency" class="form-label">Urgency Level *</label>
-                                    <select class="form-select" id="urgency" required>
+                                    <select class="form-select" id="urgency" name="urgency" required>
                                         <option value="">Select urgency level</option>
                                         <option value="low">Low - Can wait a few weeks</option>
                                         <option value="medium">Medium - Needed within a week</option>
@@ -58,7 +71,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="contact" class="form-label">Contact Information</label>
-                                    <input type="text" class="form-control" id="contact" placeholder="Phone number or alternative contact">
+                                    <input type="text" class="form-control" id="contact" name="contact" placeholder="Phone number or alternative contact">
                                 </div>
                             </div>
                             
@@ -87,5 +100,8 @@
     </div>
     
     <%- include('../partials/footer') %>
+    
+    <!-- Form submits directly to boundary via POST -->
+    <!-- No JavaScript needed - pure HTML form submission -->
 </body>
 </html>

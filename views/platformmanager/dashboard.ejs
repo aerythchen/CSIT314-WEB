@@ -14,76 +14,196 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="fas fa-cogs"></i> Platform Manager Dashboard</h2>
-                    <span class="badge bg-primary">Welcome, <%= user.firstName %>!</span>
-                </div>
+                <h2><i class="fas fa-cogs"></i> Welcome, <%= user.name %></h2>
+                <p>Manage categories and generate reports</p>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-primary text-white">
-                                <h5><i class="fas fa-tags"></i> Category Management</h5>
-                            </div>
+                <% if (error) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                    </div>
+                <% } %>
+                
+                <% if (success) { %>
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i> <%= success %>
+                    </div>
+                <% } %>
+                
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
                             <div class="card-body">
-                                <p>Manage request categories and classifications</p>
-                                <div class="d-grid gap-2">
-                                    <a href="/platformmanager/categories" class="btn btn-outline-primary">
-                                        <i class="fas fa-list"></i> View All Categories
-                                    </a>
-                                </div>
+                                <i class="fas fa-tags fa-3x text-primary mb-3"></i>
+                                <h5>Categories</h5>
+                                <a href="#categories-section" class="btn btn-primary">Manage</a>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-success text-white">
-                                <h5><i class="fas fa-chart-bar"></i> Reports & Analytics</h5>
-                            </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
                             <div class="card-body">
-                                <p>Generate reports and view platform analytics</p>
-                                <div class="d-grid gap-2">
-                                    <a href="/platformmanager/reports" class="btn btn-outline-success">
-                                        <i class="fas fa-chart-line"></i> View Reports
-                                    </a>
-                                </div>
+                                <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
+                                <h5>Daily Reports</h5>
+                                <a href="#reports-section" class="btn btn-success">Generate</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                                <h5>Weekly Reports</h5>
+                                <a href="#reports-section" class="btn btn-info">Generate</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-pie fa-3x text-warning mb-3"></i>
+                                <h5>Monthly Reports</h5>
+                                <a href="#reports-section" class="btn btn-warning">Generate</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5><i class="fas fa-chart-pie"></i> Platform Statistics</h5>
+                <!-- Categories Management Section -->
+                <div class="card mb-4" id="categories-section">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tags"></i> Category Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Create Category -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6>Create New Category</h6>
+                                <form action="/bce/platformmanager_createcategory/createCategory" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <div class="mb-3">
+                                        <label for="categoryName" class="form-label">Category Name</label>
+                                        <input type="text" class="form-control" id="categoryName" name="categoryName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Create Category
+                                    </button>
+                                </form>
                             </div>
-                            <div class="card-body">
-                                <div class="row text-center">
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-primary">42</h3>
-                                            <p class="mb-0">Total Users</p>
-                                        </div>
+                            
+                            <div class="col-md-6">
+                                <h6>Update Category</h6>
+                                <form action="/bce/platformmanager_updatecategory/updateCategory" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <div class="mb-3">
+                                        <label for="categoryId" class="form-label">Category ID</label>
+                                        <input type="text" class="form-control" id="categoryId" name="categoryId" required>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-success">15</h3>
-                                            <p class="mb-0">Active Requests</p>
-                                        </div>
+                                    <div class="mb-3">
+                                        <label for="newName" class="form-label">New Name</label>
+                                        <input type="text" class="form-control" id="newName" name="newName">
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-warning">8</h3>
-                                            <p class="mb-0">Categories</p>
-                                        </div>
+                                    <button type="submit" class="btn btn-secondary">
+                                        <i class="fas fa-edit"></i> Update Category
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Category Actions -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <form action="/bce/platformmanager_viewcategory/viewCategory" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <button type="submit" class="btn btn-info w-100">
+                                        <i class="fas fa-eye"></i> View All Categories
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <form action="/bce/platformmanager_deletecategory/deleteCategory" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <div class="mb-2">
+                                        <input type="text" class="form-control" name="categoryId" placeholder="Category ID to delete">
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="border rounded p-3">
-                                            <h3 class="text-info">25</h3>
-                                            <p class="mb-0">Shortlists</p>
-                                        </div>
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="fas fa-trash"></i> Delete Category
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <form action="/bce/platformmanager_searchreport/searchReport" method="POST">
+                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                    <button type="submit" class="btn btn-warning w-100">
+                                        <i class="fas fa-search"></i> Search Reports
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Generation Section -->
+                <div class="card mb-4" id="reports-section">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar"></i> Report Generation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-day fa-3x text-success mb-3"></i>
+                                        <h6>Daily Report</h6>
+                                        <form action="/bce/platformmanager_generatedailyreport/generateDailyReport" method="POST">
+                                            <input type="hidden" name="userId" value="<%= user.id %>">
+                                            <div class="mb-2">
+                                                <input type="date" class="form-control" name="date" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-download"></i> Generate Daily
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-week fa-3x text-info mb-3"></i>
+                                        <h6>Weekly Report</h6>
+                                        <form action="/bce/platformmanager_generateweeklyreport/generateWeeklyReport" method="POST">
+                                            <input type="hidden" name="userId" value="<%= user.id %>">
+                                            <div class="mb-2">
+                                                <input type="week" class="form-control" name="week" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-info">
+                                                <i class="fas fa-download"></i> Generate Weekly
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-alt fa-3x text-warning mb-3"></i>
+                                        <h6>Monthly Report</h6>
+                                        <form action="/bce/platformmanager_generatemonthlyreport/generateMonthlyReport" method="POST">
+                                            <input type="hidden" name="userId" value="<%= user.id %>">
+                                            <div class="mb-2">
+                                                <input type="month" class="form-control" name="month" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-warning">
+                                                <i class="fas fa-download"></i> Generate Monthly
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

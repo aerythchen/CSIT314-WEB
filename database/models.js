@@ -64,6 +64,18 @@ const models = {
         createdAt: { type: 'datetime', default: 'now' },
         isDeleted: { type: 'boolean', default: false }
     },
+    matches: {
+        id: { type: 'string', required: true, unique: true },
+        requestId: { type: 'string', required: true, foreignKey: 'requests.id' },
+        csrId: { type: 'string', required: true, foreignKey: 'userProfiles.id' },
+        serviceType: { type: 'string', required: true },
+        status: { type: 'enum', enum: ['pending', 'completed', 'cancelled'], default: 'pending' },
+        completedAt: { type: 'datetime', required: false },
+        notes: { type: 'string', required: false },
+        createdAt: { type: 'datetime', default: 'now' },
+        updatedAt: { type: 'datetime', default: 'now' },
+        isDeleted: { type: 'boolean', default: false }
+    },
     auditLogs: {
         id: { type: 'string', required: true, unique: true },
         userId: { type: 'string', required: true, foreignKey: 'userProfiles.id' },
