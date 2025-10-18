@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build output
+build/
+dist/
+out/
+coverage/
+.nyc_output/
+
+# Caches
+.cache/
+.parcel-cache/
+.eslintcache
+.turbo/
+.pnpm-store/
+
+# Tooling
+.cursor/
+*.swp
+
+# OS/Editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+# Serverless/hosting (optional; uncomment if used)
+#.vercel/
+#.netlify/
+
+# Local uploads/temp (add paths you don't want in git)
+#public/uploads/
+#tmp/
+#temp/
