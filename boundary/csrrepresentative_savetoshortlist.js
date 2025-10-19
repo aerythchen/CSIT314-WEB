@@ -10,9 +10,6 @@ class Csrrepresentative_savetoshortlistBoundary {
         return await this.controller.saveToShortlist(data);
     }
 
-    async handleFormSubmission(formData) {
-        return this.handleSaveToShortlist(formData);
-    }
 }
 
 module.exports = Csrrepresentative_savetoshortlistBoundary;
