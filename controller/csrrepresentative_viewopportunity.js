@@ -1,24 +1,26 @@
-const CSRRepresentative = require('../entity/CSRRepresentative');
+const Request = require('../entity/Request');
 
 class ViewOpportunityController {
     constructor() {
-        this.entity = new CSRRepresentative();
+        this.entity = new Request();
         // Entity ready to use
     }
 
-    viewOpportunity(data) {
+    async viewOpportunity(data) {
         const { opportunityId } = data;
         
-        if (!opportunityId) {
-            return {
-                success: false,
-                error: "Opportunity ID is required",
-                data: null
-            };
-        }
+        // Get specific opportunity details
+        const result = await this.entity.viewOpportunity(opportunityId);
+        return result;
+    }
+
+    async acceptRequest(data) {
+        const { userId, requestId, serviceType } = data;
         
-        // Use consolidated entity method directly
-        const result = this.entity.viewOpportunity(opportunityId);
+        console.log(`ViewOpportunityController: Accepting request ${requestId} for user ${userId}`);
+        
+        // Call entity to accept request
+        const result = await this.entity.acceptRequest(userId, requestId, serviceType);
         return result;
     }
 }

@@ -1,49 +1,27 @@
-const ViewHistoryController = require('../controller/csrrepresentative_viewhistory');
+const csrrepresentative_viewhistory = require('../controller/csrrepresentative_viewhistory');
 
 class Csrrepresentative_viewhistoryBoundary {
     constructor() {
-        this.controller = new ViewHistoryController();
+        this.controller = new csrrepresentative_viewhistory();
     }
 
-    handleViewHistory(data) {
-        // 1. DATA FORMATTING (UI Logic)
-        const formattedData = this.formatDataForController(data);
-        
-        // 2. CALL CONTROLLER
-        const result = this.controller.viewHistory(formattedData);
-        
-        // 3. FORMAT RESPONSE FOR UI (UI Logic)
-        return this.formatResponseForUI(result);
+    async handleViewHistory(data) {
+        return await this.controller.viewHistory(data);
     }
 
-    handleFormSubmission(formData) {
-        return this.handleViewHistory(formData);
-    }
-    
-    formatDataForController(uiData) {
-        // Format UI data for view history business logic
-        return {
-            userId: uiData.userId,
-            userType: 'csrrepresentative'
-        };
-    }
-    
-    formatResponseForUI(result) {
-        // Simple response formatting for UI
-        if (result.success) {
-            return {
-                success: true,
-                message: result.message || 'History retrieved successfully',
-                redirectUrl: '/csrrepresentative/dashboard'
-            };
-        } else {
+    async handleCompleteMatch(data) {
+        const { matchId } = data;
+        
+        if (!matchId) {
             return {
                 success: false,
-                error: result.error
+                error: "Match ID is required",
+                data: null
             };
         }
+        
+        return await this.controller.completeMatch(data);
     }
 }
 
 module.exports = Csrrepresentative_viewhistoryBoundary;
-

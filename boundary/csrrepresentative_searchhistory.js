@@ -1,52 +1,25 @@
-const SearchHistoryController = require('../controller/csrrepresentative_searchhistory');
+const csrrepresentative_searchhistory = require('../controller/csrrepresentative_searchhistory');
 
 class Csrrepresentative_searchhistoryBoundary {
     constructor() {
-        this.controller = new SearchHistoryController();
+        this.controller = new csrrepresentative_searchhistory();
     }
 
-    handleSearchHistory(data) {
-        // 1. DATA FORMATTING (UI Logic)
-        const formattedData = this.formatDataForController(data);
+    async handleSearchHistory(data) {
+        const { userId, searchTerm, category, urgency, status } = data;
         
-        // 2. CALL CONTROLLER
-        const result = this.controller.searchHistory(formattedData);
-        
-        // 3. FORMAT RESPONSE FOR UI (UI Logic)
-        return this.formatResponseForUI(result);
-    }
-
-    handleFormSubmission(formData) {
-        return this.handleSearchHistory(formData);
-    }
-    
-    formatDataForController(uiData) {
-        // Format UI data for search history business logic
-        return {
-            userId: uiData.userId,
-            serviceType: uiData.serviceType || null,
-            startDate: uiData.startDate || null,
-            endDate: uiData.endDate || null,
-            userType: 'csrrepresentative'
-        };
-    }
-    
-    formatResponseForUI(result) {
-        // Simple response formatting for UI
-        if (result.success) {
-            return {
-                success: true,
-                message: result.message || 'History search completed successfully',
-                redirectUrl: '/csrrepresentative/dashboard'
-            };
-        } else {
+        // Validate search criteria
+        if (searchTerm && searchTerm.trim().length < 2) {
             return {
                 success: false,
-                error: result.error
+                error: "Search term must be at least 2 characters",
+                results: []
             };
         }
+        
+        // Call controller for business logic
+        return await this.controller.searchHistory(data);
     }
 }
 
 module.exports = Csrrepresentative_searchhistoryBoundary;
-

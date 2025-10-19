@@ -31,45 +31,36 @@
                 
                 <!-- Quick Actions -->
                 <div class="row mb-4">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="card text-center">
                             <div class="card-body">
                                 <i class="fas fa-list fa-3x text-primary mb-3"></i>
-                                <h5>View All Requests</h5>
-                                <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                <h5>View Requests</h5>
+                                <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST" class="d-inline">
                                     <input type="hidden" name="searchTerm" value="">
                                     <input type="hidden" name="category" value="">
                                     <input type="hidden" name="urgency" value="">
+                                    <input type="hidden" name="viewAll" value="true">
                                     <button type="submit" class="btn btn-primary">View All</button>
                                 </form>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="card text-center">
                             <div class="card-body">
                                 <i class="fas fa-star fa-3x text-warning mb-3"></i>
-                                <h5>My Shortlist</h5>
-                                <a href="#shortlist-section" class="btn btn-warning">View Shortlist</a>
+                                <h5>View Shortlist</h5>
+                                <a href="/csrrepresentative/shortlist-results" class="btn btn-warning">View Shortlist</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="card text-center">
                             <div class="card-body">
-                                <i class="fas fa-eye fa-3x text-info mb-3"></i>
-                                <h5>View Opportunities</h5>
-                                <a href="#view-section" class="btn btn-info">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-cog fa-3x text-success mb-3"></i>
-                                <h5>Manage</h5>
-                                <a href="#manage-section" class="btn btn-success">Manage</a>
+                                <i class="fas fa-history fa-3x text-info mb-3"></i>
+                                <h5>View History</h5>
+                                <a href="/csrrepresentative/history-results" class="btn btn-info">View History</a>
                             </div>
                         </div>
                     </div>
@@ -82,7 +73,6 @@
                     </div>
                     <div class="card-body">
                         <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST">
-                            <input type="hidden" name="userId" value="<%= user.id %>">
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label for="searchTerm" class="form-label">Search Term</label>
@@ -92,11 +82,8 @@
                                     <label for="category" class="form-label">Category</label>
                                     <select class="form-select" id="category" name="category">
                                         <option value="">All Categories</option>
-                                        <option value="food">Food Assistance</option>
-                                        <option value="housing">Housing Support</option>
-                                        <option value="medical">Medical Aid</option>
-                                        <option value="education">Education</option>
-                                        <option value="emergency">Emergency Relief</option>
+                                        <option value="Food Assistance">Food Assistance</option>
+                                        <option value="Housing Support">Housing Support</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -149,8 +136,7 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <form action="/bce/csrrepresentative_searchshortlist/searchShortlist" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
+                                <form action="/csrrepresentative/shortlist-results" method="GET">
                                     <div class="input-group">
                                         <input type="text" class="form-control" name="searchTerm" placeholder="Search shortlist">
                                         <button type="submit" class="btn btn-outline-secondary">
@@ -160,12 +146,9 @@
                                 </form>
                             </div>
                             <div class="col-md-6">
-                                <form action="/bce/csrrepresentative_viewshortlist/viewShortlist" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-list"></i> View All Shortlist
-                                    </button>
-                                </form>
+                                <a href="/csrrepresentative/shortlist-results" class="btn btn-warning">
+                                    <i class="fas fa-list"></i> View All Shortlist
+                                </a>
                             </div>
                         </div>
                         
@@ -187,41 +170,49 @@
                     </div>
                     <div class="card-body">
                         <!-- View All History -->
-                        <form action="/bce/csrrepresentative_viewhistory/viewHistory" method="POST" class="mb-4">
-                            <input type="hidden" name="userId" value="<%= user.id %>">
-                            <button type="submit" class="btn btn-info w-100">
-                                <i class="fas fa-list"></i> View All Match History
-                            </button>
-                        </form>
+                        <a href="/csrrepresentative/history-results" class="btn btn-info w-100 mb-4">
+                            <i class="fas fa-list"></i> View All Match History
+                        </a>
 
                         <hr>
 
                         <!-- Search History -->
                         <h6 class="mb-3">Search History</h6>
-                        <form action="/bce/csrrepresentative_searchhistory/searchHistory" method="POST">
-                            <input type="hidden" name="userId" value="<%= user.id %>">
+                        <form action="/csrrepresentative/history-results" method="GET">
                             <div class="mb-3">
-                                <label for="serviceType" class="form-label">Service Type</label>
-                                <select class="form-select" id="serviceType" name="serviceType">
-                                    <option value="">All Types</option>
-                                    <option value="food">Food Assistance</option>
-                                    <option value="housing">Housing Support</option>
-                                    <option value="medical">Medical Aid</option>
-                                    <option value="education">Education</option>
-                                    <option value="emergency">Emergency Relief</option>
-                                </select>
+                                <label for="searchTerm" class="form-label">Search Term</label>
+                                <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Search by title or description...">
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="startDate" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" id="startDate" name="startDate">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category" name="category">
+                                        <option value="">All Categories</option>
+                                        <option value="Food Assistance">Food Assistance</option>
+                                        <option value="Housing Support">Housing Support</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="endDate" class="form-label">End Date</label>
-                                    <input type="date" class="form-control" id="endDate" name="endDate">
+                                    <label for="urgency" class="form-label">Urgency</label>
+                                    <select class="form-select" id="urgency" name="urgency">
+                                        <option value="">All Urgency</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Match Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-outline-info w-100">
                                 <i class="fas fa-search"></i> Search History
                             </button>
                         </form>

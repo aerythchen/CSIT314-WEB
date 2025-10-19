@@ -5,43 +5,20 @@ class Csrrepresentative_searchshortlistBoundary {
         this.controller = new csrrepresentative_searchshortlist();
     }
 
-    handleSearchShortlist(data) {
-        // 1. DATA FORMATTING (UI Logic)
-        const formattedData = this.formatDataForController(data);
+    async handleSearchShortlist(data) {
+        const { userId, searchTerm, category, urgency } = data;
         
-        // 2. CALL CONTROLLER
-        const result = this.controller.searchShortlist(formattedData);
-        
-        // 3. FORMAT RESPONSE FOR UI (UI Logic)
-        return this.formatResponseForUI(result);
-    }
-
-    handleFormSubmission(formData) {
-        return this.handleSearchShortlist(formData);
-    }
-    
-    formatDataForController(uiData) {
-        // Format UI data for searchshortlist business logic
-        return {
-            ...uiData,
-            userType: 'csrrepresentative'
-        };
-    }
-    
-    formatResponseForUI(result) {
-        // Simple response formatting for UI
-        if (result.success) {
-            return {
-                success: true,
-                message: result.message || 'Operation successful',
-                redirectUrl: result.redirectUrl || '/csrrepresentative/dashboard'
-            };
-        } else {
+        // Validate search criteria
+        if (searchTerm && searchTerm.trim().length < 2) {
             return {
                 success: false,
-                error: result.error
+                error: "Search term must be at least 2 characters",
+                results: []
             };
         }
+        
+        // Call controller for business logic
+        return await this.controller.searchShortlist(data);
     }
 }
 

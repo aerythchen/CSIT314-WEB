@@ -1,99 +1,28 @@
-const CSRRepresentative = require('../entity/CSRRepresentative');
+const Request = require('../entity/Request');
 
 class ViewHistoryController {
     constructor() {
-        this.entity = new CSRRepresentative();
+        this.entity = new Request();
         // Entity ready to use
     }
 
-    viewHistory(data) {
+    async viewHistory(data) {
         const { userId } = data;
         
-        console.log(`ViewHistoryController: Fetching all history for user ${userId}...`);
-        
-        if (!userId) {
-            return {
-                success: false,
-                error: "User ID is required",
-                data: []
-            };
-        }
-        
-        // Use consolidated entity method directly
-        const result = this.entity.viewHistory();
-        
-        if (!result.success) {
-            return {
-                success: false,
-                error: result.error,
-                data: []
-            };
-        }
-        
-        return {
-            success: true,
-            message: 'History retrieved successfully',
-            data: result.data,
-            count: result.count
-        };
+        // Get user's match history
+        const result = await this.entity.getUserHistory(userId);
+        return result;
     }
 
-    getAllHistory(userId) {
-        console.log(`Fetching all history for user ${userId}...`);
+    async completeMatch(data) {
+        const { userId, matchId, notes } = data;
         
-        if (!userId) {
-            return {
-                success: false,
-                error: "User ID is required",
-                data: []
-            };
-        }
+        console.log(`ViewHistoryController: Completing match ${matchId} for user ${userId}`);
         
-        // Use Entity to fetch all history records
-        const entityResult = this.entity.process({
-            userId: userId,
-            fetchAll: true
-        });
-        
-        if (!entityResult.success) {
-            return {
-                success: false,
-                error: entityResult.error,
-                data: []
-            };
-        }
-        
-        const historyData = this.entity.getData();
-        
-        return {
-            success: true,
-            data: historyData.data.historyRecords,
-            count: historyData.data.historyRecords?.length || 0
-        };
-    }
-
-    processViewHistory(entityResult) {
-        console.log("Processing view history request...");
-        
-        if (!entityResult || !entityResult.success) {
-            return {
-                success: false,
-                error: "History record not found",
-                data: null
-            };
-        }
-        
-        // Get stored data
-        const storedData = this.entity.getData();
-        
-        console.log("Retrieved history record");
-        
-        return {
-            success: true,
-            data: storedData.data.historyRecords?.[0] || storedData.data
-        };
+        // Call entity to complete match
+        const result = await this.entity.completeMatch(userId, matchId, notes);
+        return result;
     }
 }
 
 module.exports = ViewHistoryController;
-
