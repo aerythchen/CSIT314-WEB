@@ -5,12 +5,12 @@ class Personinneed_searchhistoryBoundary {
         this.controller = new personinneed_searchhistory();
     }
 
-    handleSearchHistory(data) {
+    async handleSearchHistory(data) {
         // 1. DATA FORMATTING (UI Logic)
         const formattedData = this.formatDataForController(data);
         
         // 2. CALL CONTROLLER
-        const result = this.controller.searchHistory(formattedData);
+        const result = await this.controller.searchHistory(formattedData);
         
         // 3. FORMAT RESPONSE FOR UI (UI Logic)
         return this.formatResponseForUI(result);

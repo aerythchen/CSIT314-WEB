@@ -10,6 +10,9 @@ class SaveToShortlistController {
         const { opportunityId, userId } = data;
         console.log(`SaveToShortlistController: Saving opportunity ${opportunityId} for user ${userId}...`);
         
+        // Track the shortlist count
+        await this.entity.trackShortlist(opportunityId, userId);
+        
         // Call entity directly and return result
         return await this.entity.saveToShortlist(userId, opportunityId);
     }

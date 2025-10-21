@@ -5,12 +5,12 @@ class Personinneed_viewhistoryBoundary {
         this.controller = new personinneed_viewhistory();
     }
 
-    handleViewHistory(data) {
+    async handleViewHistory(data) {
         // 1. DATA FORMATTING (UI Logic)
         const formattedData = this.formatDataForController(data);
         
         // 2. CALL CONTROLLER
-        const result = this.controller.viewHistory(formattedData);
+        const result = await this.controller.viewHistory(formattedData);
         
         // 3. FORMAT RESPONSE FOR UI (UI Logic)
         return this.formatResponseForUI(result);
