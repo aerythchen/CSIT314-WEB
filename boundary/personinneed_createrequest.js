@@ -73,10 +73,10 @@ class Personinneed_createrequestBoundary {
         }
         
         // Validate description (optional)
-        if (description && description.trim().length > 0 && description.trim().length < 20) {
+        if (description && description.trim().length > 0 && description.trim().length < 10) {
             return {
                 isValid: false,
-                error: "Description must be at least 20 characters if provided"
+                error: "Description must be at least 10 characters if provided"
             };
         }
         
