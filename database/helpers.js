@@ -1,4 +1,4 @@
-const db = require('./InMemoryDB').getInstance();
+const { db } = require('./index');
 
 const UserProfileHelpers = {
     findAll: (filters) => db.find('userProfiles', filters),

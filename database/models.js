@@ -1,21 +1,20 @@
 const models = {
     userProfiles: {
         id: { type: 'string', required: true, unique: true },
-        firstName: { type: 'string', required: true, minLength: 2 },
-        lastName: { type: 'string', required: true, minLength: 2 },
-        email: { type: 'string', required: true, unique: true, format: 'email' },
         userType: { type: 'enum', enum: ['csrrepresentative', 'personinneed', 'platformmanager', 'useradmin'], required: true },
-        status: { type: 'enum', enum: ['active', 'suspended', 'inactive'], default: 'active' },
-        createdAt: { type: 'datetime', default: 'now' },
-        updatedAt: { type: 'datetime', default: 'now' },
-        isDeleted: { type: 'boolean', default: false }
+        status: { type: 'enum', enum: ['active', 'suspended', 'inactive'], default: 'active' }
     },
     userAccounts: {
         id: { type: 'string', required: true, unique: true },
         profileId: { type: 'string', required: true, foreignKey: 'userProfiles.id' },
-        username: { type: 'string', required: true, unique: true, minLength: 3 },
+        firstName: { type: 'string', required: true, minLength: 2 },
+        lastName: { type: 'string', required: true, minLength: 2 },
+        email: { type: 'string', required: true, unique: true, format: 'email' },
         passwordHash: { type: 'string', required: true },
+        userType: { type: 'enum', enum: ['csrrepresentative', 'personinneed', 'platformmanager', 'useradmin'], required: true },
         status: { type: 'enum', enum: ['active', 'suspended', 'inactive'], default: 'active' },
+        lastLogin: { type: 'datetime', required: false },
+        loginAttempts: { type: 'number', default: 0 },
         createdAt: { type: 'datetime', default: 'now' },
         updatedAt: { type: 'datetime', default: 'now' },
         isDeleted: { type: 'boolean', default: false }
@@ -74,18 +73,6 @@ const models = {
         notes: { type: 'string', required: false },
         createdAt: { type: 'datetime', default: 'now' },
         updatedAt: { type: 'datetime', default: 'now' },
-        isDeleted: { type: 'boolean', default: false }
-    },
-    auditLogs: {
-        id: { type: 'string', required: true, unique: true },
-        userId: { type: 'string', required: true, foreignKey: 'userProfiles.id' },
-        action: { type: 'string', required: true },
-        entityType: { type: 'string', required: true },
-        entityId: { type: 'string', required: true },
-        details: { type: 'object', required: false },
-        ipAddress: { type: 'string', required: false },
-        userAgent: { type: 'string', required: false },
-        createdAt: { type: 'datetime', default: 'now' },
         isDeleted: { type: 'boolean', default: false }
     }
 };

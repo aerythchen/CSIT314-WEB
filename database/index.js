@@ -1,20 +1,25 @@
-const InMemoryDB = require('./InMemoryDB');
+const PostgreSQLDB = require('./PostgreSQLDB');
 const models = require('./models');
-const seedData = require('./seedData');
+const seedData = require('./seedData-robust');
 const { UserProfileHelpers, UserAccountHelpers, CategoryHelpers, RequestHelpers, ShortlistHelpers, SessionHelpers, MatchHelpers } = require('./helpers');
 
-const db = new InMemoryDB();
+const db = PostgreSQLDB.getInstance();
 
-// Initialize tables based on models
-for (const tableName in models) {
-    db.createTable(tableName);
-}
+// Test database connection
+db.testConnection().then(success => {
+    if (success) {
+        console.log('✅ PostgreSQL database connected successfully!');
+    } else {
+        console.error('❌ Failed to connect to PostgreSQL database');
+        process.exit(1);
+    }
+});
 
 // Export the database instance and helpers
 module.exports = {
-    db: InMemoryDB.getInstance(), // Export the singleton instance
+    db: db, // Export the PostgreSQL instance
     models,
-    seedDatabase: () => seedData(InMemoryDB.getInstance()),
+    seedDatabase: () => seedData(db),
     UserProfileHelpers,
     UserAccountHelpers,
     CategoryHelpers,

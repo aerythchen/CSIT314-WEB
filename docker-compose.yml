@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: csit314-postgres
+    environment:
+      POSTGRES_DB: csit314_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seedData-robust.js:/docker-entrypoint-initdb.d/02-seed.js
+    networks:
+      - csit314-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Node.js Application
+  app:
+    build: .
+    container_name: csit314-app
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: csit314_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - csit314-network
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  # Database initialization (runs once)
+  db-init:
+    build: .
+    container_name: csit314-db-init
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: csit314_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - csit314-network
+    command: ["node", "add-test-data.js"]
+    restart: "no"
+
+volumes:
+  postgres_data:
+
+networks:
+  csit314-network:
+    driver: bridge

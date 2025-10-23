@@ -7,6 +7,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/css/styles.css" rel="stylesheet">
+    <style>
+        .stats-card {
+            transition: transform 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .action-btn {
+            margin: 2px;
+        }
+        .search-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .user-type-badge {
+            font-size: 0.8em;
+        }
+    </style>
 </head>
 <body>
     <%- include('../partials/header', { title: 'User Admin Dashboard', user: user }) %>
@@ -14,240 +35,886 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <h2><i class="fas fa-user-shield"></i> Welcome, <%= user.name %></h2>
-                <p>Manage user accounts and profiles</p>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2><i class="fas fa-user-shield text-primary"></i> User Administration</h2>
+                        <p class="text-muted">Welcome back, <%= user.name %>! Manage users across the platform.</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-primary fs-6">Admin Panel</span>
+                    </div>
+                </div>
                 
-                <% if (error) { %>
-                    <div class="alert alert-danger" role="alert">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <% } %>
                 
-                <% if (success) { %>
-                    <div class="alert alert-success" role="alert">
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="fas fa-check-circle"></i> <%= success %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <% } %>
                 
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Total Users</h5>
+                                <h3 class="text-primary" id="totalUsers">-</h3>
+                                <small class="text-muted">Active users</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                                <h5 class="card-title">New This Week</h5>
+                                <h3 class="text-success" id="newUsers">-</h3>
+                                <small class="text-muted">Recent registrations</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-shield fa-3x text-info mb-3"></i>
+                                <h5 class="card-title">Admins</h5>
+                                <h3 class="text-info" id="adminUsers">-</h3>
+                                <small class="text-muted">Administrative users</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Quick Actions -->
                 <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-center">
+                    <div class="col-md-4">
+                        <div class="card text-center border-0 shadow-sm">
                             <div class="card-body">
-                                <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-                                <h5>User Accounts</h5>
-                                <a href="#accounts-section" class="btn btn-primary">Manage</a>
+                                <i class="fas fa-user-plus fa-2x text-primary mb-2"></i>
+                                <h6>Create User</h6>
+                                <button class="btn btn-primary btn-sm" onclick="showCreateUserModal()">
+                                    <i class="fas fa-plus"></i> Create
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
+                    <div class="col-md-4">
+                        <div class="card text-center border-0 shadow-sm">
                             <div class="card-body">
-                                <i class="fas fa-id-card fa-3x text-info mb-3"></i>
-                                <h5>User Profiles</h5>
-                                <a href="#profiles-section" class="btn btn-info">Manage</a>
+                                <i class="fas fa-search fa-2x text-success mb-2"></i>
+                                <h6>Search Users</h6>
+                                <button class="btn btn-success btn-sm" onclick="showSearchModal()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
+                    <div class="col-md-4">
+                        <div class="card text-center border-0 shadow-sm">
                             <div class="card-body">
-                                <i class="fas fa-search fa-3x text-success mb-3"></i>
-                                <h5>Search Users</h5>
-                                <a href="#search-section" class="btn btn-success">Search</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-ban fa-3x text-warning mb-3"></i>
-                                <h5>Suspend Users</h5>
-                                <a href="#suspend-section" class="btn btn-warning">Suspend</a>
+                                <i class="fas fa-list fa-2x text-info mb-2"></i>
+                                <h6>View All</h6>
+                                <button class="btn btn-info btn-sm" onclick="loadAllUsers()">
+                                    <i class="fas fa-list"></i> View All
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- User Accounts Management Section -->
-                <div class="card mb-4" id="accounts-section">
-                    <div class="card-header">
-                        <h5><i class="fas fa-user-plus"></i> User Account Management</h5>
+                <!-- Users Table -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-users"></i> User Management</h5>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-primary btn-sm" onclick="refreshUsers()">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" onclick="showCreateUserModal()">
+                                    <i class="fas fa-plus"></i> Add User
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <!-- Create Account -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6>Create User Account</h6>
-                                <form action="/bce/useradmin_createuseraccount/createUserAccount" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-3">
-                                        <label for="username" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Create Account
-                                    </button>
-                                </form>
+                        <!-- Search and Filter Bar -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search users...">
+                                </div>
                             </div>
-                            
+                            <div class="col-md-3">
+                                <select class="form-select" id="userTypeFilter">
+                                    <option value="">All User Types</option>
+                                    <option value="personinneed">Person in Need</option>
+                                    <option value="csrrepresentative">CSR Representative</option>
+                                    <option value="platformmanager">Platform Manager</option>
+                                    <option value="useradmin">User Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" onclick="searchUsers()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Users Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Last Active</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading users...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Users pagination">
+                            <ul class="pagination justify-content-center" id="usersPagination">
+                                <!-- Pagination will be generated by JavaScript -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-plus"></i> Create New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+                        <div class="row">
                             <div class="col-md-6">
-                                <h6>Update User Account</h6>
-                                <form action="/bce/useradmin_updateuseraccount/updateUserAccount" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-3">
-                                        <label for="accountId" class="form-label">Account ID</label>
-                                        <input type="text" class="form-control" id="accountId" name="accountId" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="newEmail" class="form-label">New Email</label>
-                                        <input type="email" class="form-control" id="newEmail" name="newEmail">
-                                    </div>
-                                    <button type="submit" class="btn btn-secondary">
-                                        <i class="fas fa-edit"></i> Update Account
-                                    </button>
-                                </form>
+                                <h6>Profile Information</h6>
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="userType" class="form-label">User Type</label>
+                                    <select class="form-select" id="userType" name="userType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="personinneed">Person in Need</option>
+                                        <option value="csrrepresentative">CSR Representative</option>
+                                        <option value="platformmanager">Platform Manager</option>
+                                        <option value="useradmin">User Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Account Information</h6>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createUser()">
+                        <i class="fas fa-plus"></i> Create User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-edit"></i> Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-user"></i> Profile Information</h6>
+                                <div class="mb-3">
+                                    <label for="editFirstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editLastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="editEmail" name="email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-key"></i> Account Information</h6>
+                                <div class="mb-3">
+                                    <label for="editUsername" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="editUsername" name="username" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editUserType" class="form-label">User Type</label>
+                                    <select class="form-select" id="editUserType" name="userType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="personinneed">Person in Need</option>
+                                        <option value="csrrepresentative">CSR Representative</option>
+                                        <option value="platformmanager">Platform Manager</option>
+                                        <option value="useradmin">User Admin</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editStatus" class="form-label">Account Status</label>
+                                    <select class="form-select" id="editStatus" name="status" required>
+                                        <option value="active">Active</option>
+                                        <option value="suspended">Suspended</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Account Actions -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <form action="/bce/useradmin_viewuseraccount/viewUserAccount" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <button type="submit" class="btn btn-info w-100">
-                                        <i class="fas fa-eye"></i> View Accounts
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="col-md-3">
-                                <form action="/bce/useradmin_searchuseraccount/searchUserAccount" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control" name="searchTerm" placeholder="Search accounts">
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-shield-alt"></i> Security Settings</h6>
+                                <div class="mb-3">
+                                    <label for="editPassword" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="editPassword" name="password" placeholder="Leave blank to keep current password">
+                                    <small class="form-text text-muted">Leave blank to keep current password</small>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="editForcePasswordReset" name="forcePasswordReset">
+                                        <label class="form-check-label" for="editForcePasswordReset">
+                                            Force password reset on next login
+                                        </label>
                                     </div>
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="fas fa-search"></i> Search Accounts
-                                    </button>
-                                </form>
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <form action="/bce/useradmin_suspenduseraccount/suspendUserAccount" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control" name="accountId" placeholder="Account ID to suspend">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-cog"></i> Account Management</h6>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="editAccountLocked" name="accountLocked">
+                                        <label class="form-check-label" for="editAccountLocked">
+                                            Account Locked
+                                        </label>
                                     </div>
-                                    <button type="submit" class="btn btn-warning w-100">
-                                        <i class="fas fa-ban"></i> Suspend Account
-                                    </button>
-                                </form>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editAdminNotes" class="form-label">Admin Notes</label>
+                                    <textarea class="form-control" id="editAdminNotes" name="adminNotes" rows="3" placeholder="Internal notes about this user..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateUser()">
+                        <i class="fas fa-save"></i> Update User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-times text-danger"></i> Delete User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this user?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> This action cannot be undone. All user data will be permanently removed.
+                    </div>
+                    <form id="deleteUserForm">
+                        <input type="hidden" id="deleteUserId">
+                        <div class="mb-3">
+                            <label for="deleteReason" class="form-label">Reason for deletion</label>
+                            <textarea class="form-control" id="deleteReason" name="reason" rows="3" required placeholder="Please provide a reason for deleting this user..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteUser()">
+                        <i class="fas fa-trash"></i> Delete User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View User Modal -->
+    <div class="modal fade" id="viewUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user"></i> User Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">First Name</label>
+                                <p class="form-control-plaintext" id="viewFirstName">-</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Last Name</label>
+                                <p class="form-control-plaintext" id="viewLastName">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <p class="form-control-plaintext" id="viewEmail">-</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Username</label>
+                                <p class="form-control-plaintext" id="viewUsername">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">User Type</label>
+                                <p class="form-control-plaintext" id="viewUserType">-</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <p class="form-control-plaintext" id="viewStatus">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Created At</label>
+                                <p class="form-control-plaintext" id="viewCreatedAt">-</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Last Updated</label>
+                                <p class="form-control-plaintext" id="viewUpdatedAt">-</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- User Profiles Management Section -->
-                <div class="card mb-4" id="profiles-section">
-                    <div class="card-header">
-                        <h5><i class="fas fa-id-card"></i> User Profile Management</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Create Profile -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6>Create User Profile</h6>
-                                <form action="/bce/useradmin_createuserprofile/createUserProfile" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-3">
-                                        <label for="firstName" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="firstName" name="firstName" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="lastName" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="lastName" name="lastName" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="userType" class="form-label">User Type</label>
-                                        <select class="form-select" id="userType" name="userType" required>
-                                            <option value="">Select Type</option>
-                                            <option value="personinneed">Person in Need</option>
-                                            <option value="csrrepresentative">CSR Representative</option>
-                                            <option value="platformmanager">Platform Manager</option>
-                                            <option value="useradmin">User Admin</option>
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Create Profile
-                                    </button>
-                                </form>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <h6>Update User Profile</h6>
-                                <form action="/bce/useradmin_updateuserprofile/updateUserProfile" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-3">
-                                        <label for="profileId" class="form-label">Profile ID</label>
-                                        <input type="text" class="form-control" id="profileId" name="profileId" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="newFirstName" class="form-label">New First Name</label>
-                                        <input type="text" class="form-control" id="newFirstName" name="newFirstName">
-                                    </div>
-                                    <button type="submit" class="btn btn-secondary">
-                                        <i class="fas fa-edit"></i> Update Profile
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        
-                        <!-- Profile Actions -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <form action="/bce/useradmin_viewuserprofile/viewUserProfile" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <button type="submit" class="btn btn-info w-100">
-                                        <i class="fas fa-eye"></i> View Profiles
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="col-md-3">
-                                <form action="/bce/useradmin_searchuserprofile/searchUserProfile" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control" name="searchTerm" placeholder="Search profiles">
-                                    </div>
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="fas fa-search"></i> Search Profiles
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="col-md-3">
-                                <form action="/bce/useradmin_suspenduserprofile/suspendUserProfile" method="POST">
-                                    <input type="hidden" name="userId" value="<%= user.id %>">
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control" name="profileId" placeholder="Profile ID to suspend">
-                                    </div>
-                                    <button type="submit" class="btn btn-warning w-100">
-                                        <i class="fas fa-ban"></i> Suspend Profile
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="editUserFromView()">
+                        <i class="fas fa-edit"></i> Edit User
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     
     <%- include('../partials/footer') %>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentUsers = [];
+        let currentPage = 1;
+        const usersPerPage = 10;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserStats();
+            loadAllUsers();
+        });
+
+        // Load user statistics
+        async function loadUserStats() {
+            try {
+                // Fetch real statistics from the backend
+                const response = await fetch('/api/user-stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.stats.totalUsers || '0';
+                    document.getElementById('newUsers').textContent = data.stats.newUsers || '0';
+                    document.getElementById('adminUsers').textContent = data.stats.adminUsers || '0';
+                } else {
+                    // Fallback to loading state
+                    document.getElementById('totalUsers').textContent = '-';
+                    document.getElementById('newUsers').textContent = '-';
+                    document.getElementById('adminUsers').textContent = '-';
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+                // Show loading state on error
+                document.getElementById('totalUsers').textContent = '-';
+                document.getElementById('newUsers').textContent = '-';
+                document.getElementById('adminUsers').textContent = '-';
+            }
+        }
+
+        // Load all users
+        async function loadAllUsers() {
+            try {
+                // Fetch real users from the database
+                const response = await fetch('/api/all-users');
+                const data = await response.json();
+                
+                if (data.success && data.users) {
+                    currentUsers = data.users;
+                    displayUsers(data.users);
+                } else {
+                    console.error('Failed to load users:', data.error);
+                    showError('Failed to load users from database: ' + (data.error || 'Unknown error'));
+                    displayUsers([]);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('Failed to load users');
+                displayUsers([]);
+            }
+        }
+
+        // Display users in table
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            <i class="fas fa-users"></i> No users found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="fw-bold">${user.name}</div>
+                                <small class="text-muted">${user.email}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-${getUserTypeColor(user.userType)} user-type-badge">
+                            ${getUserTypeLabel(user.userType)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-${getStatusColor(user.status)}">
+                            ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                        </span>
+                    </td>
+                    <td>${user.lastActive}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" onclick="editUser('${user.id}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="viewUser('${user.id}')" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="showDeleteModal('${user.id}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Helper functions
+        function getUserTypeColor(type) {
+            const colors = {
+                'personinneed': 'info',
+                'csrrepresentative': 'success',
+                'platformmanager': 'warning',
+                'useradmin': 'danger'
+            };
+            return colors[type] || 'secondary';
+        }
+
+        function getUserTypeLabel(type) {
+            const labels = {
+                'personinneed': 'Person in Need',
+                'csrrepresentative': 'CSR Rep',
+                'platformmanager': 'Platform Manager',
+                'useradmin': 'User Admin'
+            };
+            return labels[type] || type;
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'active': 'success',
+                'pending': 'warning'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        // Modal functions
+        function showCreateUserModal() {
+            const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+            modal.show();
+        }
+
+        function showDeleteModal(userId) {
+            document.getElementById('deleteUserId').value = userId;
+            const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+            modal.show();
+        }
+
+        // User actions
+        function createUser() {
+            const form = document.getElementById('createUserForm');
+            const formData = new FormData(form);
+            
+            // Add userId from session
+            formData.append('userId', '<%= user.id %>');
+            
+            // Submit to create user endpoint
+            fetch('/bce/useradmin_createuserprofile/createUserProfile', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('User created successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
+                    loadAllUsers();
+                } else {
+                    showError(data.error || 'Failed to create user');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating user:', error);
+                showError('Failed to create user');
+            });
+        }
+
+        function editUser(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (user) {
+                // Basic information
+                document.getElementById('editUserId').value = userId;
+                document.getElementById('editFirstName').value = user.name.split(' ')[0];
+                document.getElementById('editLastName').value = user.name.split(' ')[1] || '';
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editUsername').value = user.username || user.email.split('@')[0];
+                
+                // User type and status
+                document.getElementById('editUserType').value = user.userType || '';
+                document.getElementById('editStatus').value = user.status || 'active';
+                
+                // Security settings (reset to defaults)
+                document.getElementById('editPassword').value = '';
+                document.getElementById('editForcePasswordReset').checked = false;
+                document.getElementById('editAccountLocked').checked = false;
+                
+                // Admin notes (if available)
+                document.getElementById('editAdminNotes').value = user.adminNotes || '';
+                
+                const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                modal.show();
+            }
+        }
+
+        function updateUser() {
+            console.log('🔄 Starting user update...');
+            
+            const form = document.getElementById('editUserForm');
+            const formData = new FormData(form);
+            const editUserId = document.getElementById('editUserId').value;
+            
+            // Add the editUserId to form data
+            formData.append('editUserId', editUserId);
+            formData.append('userId', '<%= user.id %>'); // Current admin user ID
+            
+            console.log('📝 Updating user with ID:', editUserId);
+            console.log('📝 Form data entries:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`   ${key}: ${value}`);
+            }
+            
+            // Debug: Check if userType is in the form data
+            const userTypeValue = formData.get('userType');
+            console.log('🔍 userType from form:', userTypeValue);
+            console.log('🔍 editUserType element value:', document.getElementById('editUserType').value);
+            
+            // Show loading state
+            const updateButton = document.querySelector('#editUserModal .btn-primary');
+            const originalText = updateButton.innerHTML;
+            updateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            updateButton.disabled = true;
+            
+            fetch('/bce/useradmin_updateuserprofile/updateUserProfile', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('📊 Response status:', response.status);
+                console.log('📊 Response headers:', Object.fromEntries(response.headers.entries()));
+                return response.json();
+            })
+            .then(data => {
+                console.log('📊 Update response:', data);
+                console.log('📊 Response success:', data.success);
+                console.log('📊 Response message:', data.message);
+                if (data.data) {
+                    console.log('📊 Response data:', data.data);
+                    if (data.data.usertype) {
+                        console.log('📊 Updated userType in response:', data.data.usertype);
+                    }
+                }
+                if (data.success) {
+                    showSuccess('User updated successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                    loadAllUsers();
+                } else {
+                    showError(data.error || 'Failed to update user');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error updating user:', error);
+                showError('Failed to update user: ' + error.message);
+            })
+            .finally(() => {
+                // Restore button state
+                updateButton.innerHTML = originalText;
+                updateButton.disabled = false;
+            });
+        }
+
+        function deleteUser() {
+            const userId = document.getElementById('deleteUserId').value;
+            const reason = document.getElementById('deleteReason').value;
+            
+            const formData = new FormData();
+            formData.append('userId', '<%= user.id %>');
+            formData.append('profileId', userId);
+            formData.append('reason', reason);
+            
+            fetch('/bce/useradmin_deleteuserprofile/deleteUserProfile', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('User deleted successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('deleteUserModal')).hide();
+                    loadAllUsers();
+                } else {
+                    showError(data.error || 'Failed to delete user');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting user:', error);
+                showError('Failed to delete user');
+            });
+        }
+
+        async function searchUsers() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const userType = document.getElementById('userTypeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                // Build search parameters
+                const searchParams = new URLSearchParams();
+                if (searchTerm) searchParams.append('searchTerm', searchTerm);
+                if (userType) searchParams.append('userType', userType);
+                if (status) searchParams.append('status', status);
+                
+                // Fetch filtered users from the database
+                const response = await fetch(`/api/search-users?${searchParams.toString()}`);
+                const data = await response.json();
+                
+                if (data.success && data.users) {
+                    displayUsers(data.users);
+                } else {
+                    console.error('Search failed:', data.error);
+                    showError('Search failed');
+                    displayUsers([]);
+                }
+            } catch (error) {
+                console.error('Error searching users:', error);
+                showError('Search failed');
+                displayUsers([]);
+            }
+        }
+
+        function refreshUsers() {
+            loadAllUsers();
+        }
+
+        function viewUser(userId) {
+            // Find the user in current users array
+            const user = currentUsers.find(u => u.id === userId);
+            
+            if (!user) {
+                showError('User not found');
+                return;
+            }
+            
+            // Populate the view modal with user data
+            const nameParts = (user.name || '').split(' ');
+            document.getElementById('viewFirstName').textContent = nameParts[0] || '-';
+            document.getElementById('viewLastName').textContent = nameParts.slice(1).join(' ') || '-';
+            document.getElementById('viewEmail').textContent = user.email || '-';
+            document.getElementById('viewUsername').textContent = user.username || '-';
+            document.getElementById('viewUserType').textContent = getUserTypeLabel(user.userType) || '-';
+            
+            // Set status
+            document.getElementById('viewStatus').textContent = user.status || '-';
+            
+            // Format dates
+            document.getElementById('viewCreatedAt').textContent = user.createdAt ? new Date(user.createdAt).toLocaleString() : '-';
+            document.getElementById('viewUpdatedAt').textContent = user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-';
+            
+            // Store current user ID for edit functionality
+            window.currentViewUserId = userId;
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+            modal.show();
+        }
+        
+        function editUserFromView() {
+            // Close the view modal
+            const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewUserModal'));
+            if (viewModal) {
+                viewModal.hide();
+            }
+            
+            // Open the edit modal for the same user
+            if (window.currentViewUserId) {
+                editUser(window.currentViewUserId);
+            }
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            // Create and show success alert
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show';
+            alert.innerHTML = `
+                <i class="fas fa-check-circle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.container-fluid').firstChild);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        function showError(message) {
+            // Create and show error alert
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger alert-dismissible fade show';
+            alert.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.container-fluid').firstChild);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
