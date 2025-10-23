@@ -306,7 +306,7 @@ class UserAccount {
             'csrrepresentative': ['search_requests', 'view_requests', 'manage_shortlist'],
             'personinneed': ['create_requests', 'view_requests', 'track_requests'],
             'platformmanager': ['manage_categories', 'view_reports', 'manage_system'],
-            'useradmin': ['manage_users', 'manage_profiles', 'view_audit_logs']
+            'useradmin': ['manage_users', 'manage_profiles']
         };
         return permissionMap[userType] || [];
     }
