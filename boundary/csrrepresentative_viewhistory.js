@@ -6,7 +6,27 @@ class Csrrepresentative_viewhistoryBoundary {
     }
 
     async handleViewHistory(data) {
-        return await this.controller.viewHistory(data);
+        const result = await this.controller.viewHistory(data);
+        
+        // If successful and has history items, render view
+        if (result.success && result.data && result.data.historyItems) {
+            return {
+                success: true,
+                renderView: 'csrrepresentative/history_results',
+                viewData: {
+                    historyItems: result.data.historyItems,
+                    success: result.message,
+                    error: null,
+                    viewAll: true,
+                    searchTerm: '',
+                    category: '',
+                    urgency: '',
+                    status: ''
+                }
+            };
+        }
+        
+        return result;
     }
 
     async handleCompleteMatch(data) {

@@ -18,7 +18,26 @@ class Csrrepresentative_searchshortlistBoundary {
         }
         
         // Call controller for business logic
-        return await this.controller.searchShortlist(data);
+        const result = await this.controller.searchShortlist(data);
+        
+        // If successful and has shortlist items, render view
+        if (result.success && result.data && result.data.shortlistItems) {
+            return {
+                success: true,
+                renderView: 'csrrepresentative/shortlist_results',
+                viewData: {
+                    shortlistItems: result.data.shortlistItems,
+                    success: result.message,
+                    error: null,
+                    viewAll: data.viewAll || (!data.searchTerm && !data.category && !data.urgency),
+                    searchTerm: data.searchTerm || '',
+                    category: data.category || '',
+                    urgency: data.urgency || ''
+                }
+            };
+        }
+        
+        return result;
     }
 }
 

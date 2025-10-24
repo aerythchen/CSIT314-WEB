@@ -307,215 +307,46 @@ app.post('/bce/:boundary/:action', async (req, res) => {
         const BoundaryClass = require(`./boundary/${boundary}`);
         const boundaryInstance = new BoundaryClass();
         
-        // Add user information from session to data for authenticated actions
-        if (req.session.user && req.session.user.id) {
-            data.userId = req.session.user.id;
-            data.userName = `${req.session.user.firstName} ${req.session.user.lastName}`;
-            
-            // Only add userType for specific operations that need it (not for user updates)
-            if (!boundary.includes('updateuserprofile') && !boundary.includes('createuserprofile')) {
-                data.userType = req.session.user.userType;
-            }
-        }
+        // Pass session context to boundary
+        data.session = req.session;
         
         // Call the appropriate method
         const methodName = `handle${action.charAt(0).toUpperCase() + action.slice(1)}`;
         const result = await boundaryInstance[methodName](data);
         
-        // Handle response based on result and boundary type
+        // Handle login session storage
+        if (result.success && boundary.includes('_login') && result.data && result.data.user) {
+            req.session.user = result.data.user;
+            console.log('✅ Session created for user:', result.data.user.name);
+        }
+        
+        // Check if boundary wants to render a view
+        if (result.success && result.renderView) {
+            res.render(result.renderView, {
+                user: req.session.user || { name: 'Guest', id: null },
+                ...result.viewData
+            });
+            return;
+        }
+        
+        // Check if boundary wants to redirect
+        if (result.success && result.redirectUrl) {
+            res.redirect(result.redirectUrl);
+            return;
+        }
+        
+        // Return JSON response
         if (result.success) {
-            // Special handling for login - store user in session
-            if (boundary.includes('_login') && result.data && result.data.user) {
-                req.session.user = result.data.user;
-                console.log('✅ Session created for user:', result.data.user.name);
-            }
-            
-            // Special handling for search results - show data instead of redirecting
-            if (boundary.includes('searchopportunity') && result.data && result.data.opportunities) {
-                res.render('csrrepresentative/search_results', {
-                    user: req.session.user || { name: 'Guest', id: null },
-                    opportunities: result.data.opportunities,
-                    success: result.message,
-                    error: null,
-                    viewAll: data.viewAll || (!data.searchTerm && !data.category && !data.urgency),
-                    searchTerm: data.searchTerm || '',
-                    category: data.category || '',
-                    urgency: data.urgency || ''
-                });
-                return;
-            }
-            
-            // Special handling for shortlist results - show data instead of redirecting
-            if (boundary.includes('viewshortlist') && result.data && result.data.shortlistItems) {
-                res.render('csrrepresentative/shortlist_results', {
-                    user: req.session.user || { name: 'Guest', id: null },
-                    shortlistItems: result.data.shortlistItems,
-                    success: result.message,
-                    error: null,
-                    viewAll: true,
-                    searchTerm: '',
-                    category: '',
-                    urgency: ''
-                });
-                return;
-            }
-            
-            // Special handling for shortlist search results - show data instead of redirecting
-            if (boundary.includes('searchshortlist') && result.data && result.data.shortlistItems) {
-                res.render('csrrepresentative/shortlist_results', {
-                    user: req.session.user || { name: 'Guest', id: null },
-                    shortlistItems: result.data.shortlistItems,
-                    success: result.message,
-                    error: null,
-                    viewAll: data.viewAll || (!data.searchTerm && !data.category && !data.urgency),
-                    searchTerm: data.searchTerm || '',
-                    category: data.category || '',
-                    urgency: data.urgency || ''
-                });
-                return;
-            }
-            
-            // Special handling for history results - show data instead of redirecting
-            if (boundary.includes('viewhistory') && result.data && result.data.historyItems) {
-                res.render('csrrepresentative/history_results', {
-                    user: req.session.user || { name: 'Guest', id: null },
-                    historyItems: result.data.historyItems,
-                    success: result.message,
-                    error: null,
-                    viewAll: true,
-                    searchTerm: '',
-                    category: '',
-                    urgency: '',
-                    status: ''
-                });
-                return;
-            }
-            
-            // Special handling for history search results - show data instead of redirecting
-            if (boundary.includes('searchhistory') && result.data && result.data.historyItems) {
-                res.render('csrrepresentative/history_results', {
-                    user: req.session.user || { name: 'Guest', id: null },
-                    historyItems: result.data.historyItems,
-                    success: result.message,
-                    error: null,
-                    viewAll: data.viewAll || (!data.searchTerm && !data.category && !data.urgency && !data.status),
-                    searchTerm: data.searchTerm || '',
-                    category: data.category || '',
-                    urgency: data.urgency || '',
-                    status: data.status || ''
-                });
-                return;
-            }
-            
-            // Special handling for view opportunity - show opportunity details
-            if (boundary.includes('viewopportunity') && result.data && result.data.opportunity) {
-                res.render('csrrepresentative/opportunity_details', {
-                    user: req.session.user || { name: 'Guest', id: null },
-                    opportunity: result.data.opportunity,
-                    success: result.message,
-                    error: null
-                });
-                return;
-            }
-            
-            // Check if this is an AJAX request
-            if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
-                res.json(result);
-                return;
-            }
-            
-            // Success - redirect based on boundary type
-            if (boundary.includes('personinneed_login')) {
-                res.redirect(`/personinneed/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('csrrepresentative_login')) {
-                res.redirect(`/csrrepresentative/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('platformmanager_login')) {
-                res.redirect(`/platformmanager/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('useradmin_login')) {
-                res.redirect(`/useradmin/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('personinneed')) {
-                res.redirect(`/personinneed/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('savetoshortlist')) {
-                // Special handling for save to shortlist - redirect back to search results
-                // Pass the search parameters and success message
-                const searchParams = new URLSearchParams();
-                if (data.searchTerm) searchParams.append('searchTerm', data.searchTerm);
-                if (data.category) searchParams.append('category', data.category);
-                if (data.urgency) searchParams.append('urgency', data.urgency);
-                if (data.viewAll) searchParams.append('viewAll', data.viewAll);
-                searchParams.append('success', result.message);
-                
-                res.redirect(`/csrrepresentative/search-results?${searchParams.toString()}`);
-        } else if (action === 'acceptRequest') {
-            // Special handling for accept request - redirect back to search results or shortlist
-            // Pass the search parameters and success message
-            const searchParams = new URLSearchParams();
-            if (data.searchTerm) searchParams.append('searchTerm', data.searchTerm);
-            if (data.category) searchParams.append('category', data.category);
-            if (data.urgency) searchParams.append('urgency', data.urgency);
-            if (data.viewAll) searchParams.append('viewAll', data.viewAll);
-            searchParams.append('success', result.message);
-            
-            // Determine which page to redirect to based on the referrer or context
-            const referrer = req.get('Referrer') || '';
-            if (referrer.includes('shortlist-results')) {
-                res.redirect(`/csrrepresentative/shortlist-results?${searchParams.toString()}`);
-            } else {
-                res.redirect(`/csrrepresentative/search-results?${searchParams.toString()}`);
-            }
-        } else if (action === 'completeMatch') {
-            // Special handling for complete match - redirect back to history results
-            const searchParams = new URLSearchParams();
-            if (data.searchTerm) searchParams.append('searchTerm', data.searchTerm);
-            if (data.category) searchParams.append('category', data.category);
-            if (data.urgency) searchParams.append('urgency', data.urgency);
-            if (data.status) searchParams.append('status', data.status);
-            searchParams.append('success', result.message);
-            
-            res.redirect(`/csrrepresentative/history-results?${searchParams.toString()}`);
-        } else if (boundary.includes('csrrepresentative') && action !== 'acceptRequest' && action !== 'completeMatch') {
-                res.redirect(`/csrrepresentative/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('platformmanager')) {
-                res.redirect(`/platformmanager/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else if (boundary.includes('useradmin')) {
-                res.redirect(`/useradmin/dashboard?success=${encodeURIComponent(result.message)}`);
-            } else {
-                res.redirect(`/?success=${encodeURIComponent(result.message)}`);
-            }
+            res.json(result);
         } else {
-            // Check if this is an AJAX request
-            if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
-                res.json(result);
-                return;
-            }
-            
-            // Error - redirect back to appropriate form
-            if (boundary.includes('_login')) {
-                res.redirect(`/?error=${encodeURIComponent(result.error)}`);
-            } else if (boundary.includes('personinneed')) {
-                res.redirect(`/personinneed/dashboard?error=${encodeURIComponent(result.error)}`);
-            } else if (boundary.includes('csrrepresentative')) {
-                res.redirect(`/csrrepresentative/dashboard?error=${encodeURIComponent(result.error)}`);
-            } else if (boundary.includes('platformmanager')) {
-                res.redirect(`/platformmanager/dashboard?error=${encodeURIComponent(result.error)}`);
-            } else if (boundary.includes('useradmin')) {
-                res.redirect(`/useradmin/dashboard?error=${encodeURIComponent(result.error)}`);
-            } else {
-                res.redirect(`/?error=${encodeURIComponent(result.error)}`);
-            }
+            res.status(400).json(result);
         }
     } catch (error) {
         console.error('Boundary access error:', error);
-        
-        // Check if this is an AJAX request
-        if (req.headers['x-requested-with'] === 'XMLHttpRequest') {
-            res.json({
-                success: false,
-                error: 'Internal server error'
-            });
-        } else {
-            res.redirect(`/?error=${encodeURIComponent('Internal server error')}`);
-        }
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error'
+        });
     }
 });
 

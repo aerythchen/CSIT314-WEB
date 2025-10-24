@@ -18,7 +18,27 @@ class Csrrepresentative_searchhistoryBoundary {
         }
         
         // Call controller for business logic
-        return await this.controller.searchHistory(data);
+        const result = await this.controller.searchHistory(data);
+        
+        // If successful and has history items, render view
+        if (result.success && result.data && result.data.historyItems) {
+            return {
+                success: true,
+                renderView: 'csrrepresentative/history_results',
+                viewData: {
+                    historyItems: result.data.historyItems,
+                    success: result.message,
+                    error: null,
+                    viewAll: data.viewAll || (!data.searchTerm && !data.category && !data.urgency && !data.status),
+                    searchTerm: data.searchTerm || '',
+                    category: data.category || '',
+                    urgency: data.urgency || '',
+                    status: data.status || ''
+                }
+            };
+        }
+        
+        return result;
     }
 }
 

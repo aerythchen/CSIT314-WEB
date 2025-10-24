@@ -6,8 +6,17 @@ class Personinneed_deleterequestBoundary {
     }
 
     async handleDeleteRequest(data) {
-        // Call controller and return result directly
-        return await this.controller.deleteRequest(data);
+        const result = await this.controller.deleteRequest(data);
+        
+        // If successful, redirect back to dashboard
+        if (result.success) {
+            return {
+                ...result,
+                redirectUrl: '/personinneed/dashboard?success=' + encodeURIComponent(result.message || 'Request deleted successfully')
+            };
+        }
+        
+        return result;
     }
 }
 
