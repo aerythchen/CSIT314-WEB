@@ -33,7 +33,7 @@
                         <h5><i class="fas fa-edit"></i> Request Details</h5>
                     </div>
                     <div class="card-body">
-                        <form id="createRequestForm" action="/bce/personinneed_createrequest/createRequest" method="POST">
+                        <form id="createRequestForm" onsubmit="createRequest(event)">
                             <input type="hidden" name="userId" value="<%= user.id %>">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -123,6 +123,58 @@
             } catch (error) {
                 console.error('Error loading categories:', error);
             }
+        }
+        
+        // Create Request Function
+        async function createRequest(event) {
+            event.preventDefault();
+            
+            try {
+                const formData = new FormData(event.target);
+                
+                const response = await fetch('/bce/personinneed_createrequest/createRequest', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message || 'Request created successfully!');
+                    // Redirect to dashboard after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/personinneed/dashboard';
+                    }, 1500);
+                } else {
+                    showError(data.error || 'Failed to create request');
+                }
+            } catch (error) {
+                console.error('Error creating request:', error);
+                showError('Failed to create request');
+            }
+        }
+        
+        // Show success message
+        function showSuccess(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.container-fluid').firstChild);
+        }
+        
+        // Show error message
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.container-fluid').firstChild);
         }
         
         // Load categories when page loads

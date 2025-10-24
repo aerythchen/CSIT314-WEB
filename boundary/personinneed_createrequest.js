@@ -36,15 +36,8 @@ class Personinneed_createrequestBoundary {
             status: 'pending'
         });
         
-        // 4. FORMAT RESPONSE FOR UI (UI Logic)
-        if (result.success) {
-            return {
-                ...result,
-                redirectUrl: result.redirectUrl || '/personinneed/dashboard'
-            };
-        } else {
-            return result;
-        }
+        // 4. RETURN JSON RESPONSE
+        return result;
     }
     
     validateRequestData(data) {

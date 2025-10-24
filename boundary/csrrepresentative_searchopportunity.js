@@ -20,23 +20,7 @@ class Csrrepresentative_searchopportunityBoundary {
         // Call controller for business logic
         const result = await this.controller.searchOpportunity(data);
         
-        // If successful and has opportunities, render view
-        if (result.success && result.data && result.data.opportunities) {
-            return {
-                success: true,
-                renderView: 'csrrepresentative/search_results',
-                viewData: {
-                    opportunities: result.data.opportunities,
-                    success: result.message,
-                    error: null,
-                    viewAll: data.viewAll || (!data.searchTerm && !data.category && !data.urgency),
-                    searchTerm: data.searchTerm || '',
-                    category: data.category || '',
-                    urgency: data.urgency || ''
-                }
-            };
-        }
-        
+        // Return JSON response
         return result;
     }
 }

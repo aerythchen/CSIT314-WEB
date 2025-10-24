@@ -320,15 +320,6 @@ app.post('/bce/:boundary/:action', async (req, res) => {
             console.log('✅ Session created for user:', result.data.user.name);
         }
         
-        // Check if boundary wants to render a view
-        if (result.success && result.renderView) {
-            res.render(result.renderView, {
-                user: req.session.user || { name: 'Guest', id: null },
-                ...result.viewData
-            });
-            return;
-        }
-        
         // Check if boundary wants to redirect
         if (result.success && result.redirectUrl) {
             res.redirect(result.redirectUrl);

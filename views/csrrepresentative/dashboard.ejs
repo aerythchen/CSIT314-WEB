@@ -36,13 +36,7 @@
                             <div class="card-body">
                                 <i class="fas fa-list fa-3x text-primary mb-3"></i>
                                 <h5>View Requests</h5>
-                                <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST" class="d-inline">
-                                    <input type="hidden" name="searchTerm" value="">
-                                    <input type="hidden" name="category" value="">
-                                    <input type="hidden" name="urgency" value="">
-                                    <input type="hidden" name="viewAll" value="true">
-                                    <button type="submit" class="btn btn-primary">View All</button>
-                                </form>
+                                <button type="button" class="btn btn-primary" onclick="viewAllOpportunities()">View All</button>
                             </div>
                         </div>
                     </div>
@@ -51,7 +45,7 @@
                             <div class="card-body">
                                 <i class="fas fa-star fa-3x text-warning mb-3"></i>
                                 <h5>View Shortlist</h5>
-                                <a href="/csrrepresentative/shortlist-results" class="btn btn-warning">View Shortlist</a>
+                                <button type="button" class="btn btn-warning" onclick="viewShortlist()">View Shortlist</button>
                             </div>
                         </div>
                     </div>
@@ -60,7 +54,7 @@
                             <div class="card-body">
                                 <i class="fas fa-history fa-3x text-info mb-3"></i>
                                 <h5>View History</h5>
-                                <a href="/csrrepresentative/history-results" class="btn btn-info">View History</a>
+                                <button type="button" class="btn btn-info" onclick="viewHistory()">View History</button>
                             </div>
                         </div>
                     </div>
@@ -72,7 +66,7 @@
                         <h5><i class="fas fa-search"></i> Search Opportunities</h5>
                     </div>
                     <div class="card-body">
-                        <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST">
+                        <form id="searchForm" onsubmit="searchOpportunities(event)">
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label for="searchTerm" class="form-label">Search Term</label>
@@ -223,5 +217,187 @@
     </div>
     
     <%- include('../partials/footer') %>
+    
+    <script>
+        // CSR Dashboard AJAX Functions
+        
+        // View All Opportunities
+        async function viewAllOpportunities() {
+            try {
+                const formData = new FormData();
+                formData.append('searchTerm', '');
+                formData.append('category', '');
+                formData.append('urgency', '');
+                formData.append('viewAll', 'true');
+                
+                const response = await fetch('/bce/csrrepresentative_searchopportunity/searchOpportunity', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayOpportunities(data.data.opportunities);
+                } else {
+                    showError(data.error || 'Failed to load opportunities');
+                }
+            } catch (error) {
+                console.error('Error loading opportunities:', error);
+                showError('Failed to load opportunities');
+            }
+        }
+        
+        // Search Opportunities
+        async function searchOpportunities(event) {
+            event.preventDefault();
+            
+            try {
+                const formData = new FormData(event.target);
+                
+                const response = await fetch('/bce/csrrepresentative_searchopportunity/searchOpportunity', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayOpportunities(data.data.opportunities);
+                } else {
+                    showError(data.error || 'Search failed');
+                }
+            } catch (error) {
+                console.error('Error searching opportunities:', error);
+                showError('Search failed');
+            }
+        }
+        
+        // View Shortlist
+        async function viewShortlist() {
+            try {
+                const formData = new FormData();
+                formData.append('userId', '<%= user.id %>');
+                
+                const response = await fetch('/bce/csrrepresentative_viewshortlist/viewShortlist', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayShortlist(data.data.shortlistItems);
+                } else {
+                    showError(data.error || 'Failed to load shortlist');
+                }
+            } catch (error) {
+                console.error('Error loading shortlist:', error);
+                showError('Failed to load shortlist');
+            }
+        }
+        
+        // View History
+        async function viewHistory() {
+            try {
+                const formData = new FormData();
+                formData.append('userId', '<%= user.id %>');
+                
+                const response = await fetch('/bce/csrrepresentative_viewhistory/viewHistory', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayHistory(data.data.historyItems);
+                } else {
+                    showError(data.error || 'Failed to load history');
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+                showError('Failed to load history');
+            }
+        }
+        
+        // Display Opportunities
+        function displayOpportunities(opportunities) {
+            const resultsContainer = document.getElementById('search-results');
+            if (!resultsContainer) {
+                // Create results container if it doesn't exist
+                const searchSection = document.getElementById('search-section');
+                const resultsDiv = document.createElement('div');
+                resultsDiv.id = 'search-results';
+                resultsDiv.className = 'card mt-4';
+                resultsDiv.innerHTML = `
+                    <div class="card-header">
+                        <h5><i class="fas fa-list"></i> Search Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="opportunities-list"></div>
+                    </div>
+                `;
+                searchSection.parentNode.insertBefore(resultsDiv, searchSection.nextSibling);
+            }
+            
+            const opportunitiesList = document.getElementById('opportunities-list');
+            if (opportunities && opportunities.length > 0) {
+                let html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Title</th><th>Category</th><th>Urgency</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                
+                opportunities.forEach(opportunity => {
+                    html += `
+                        <tr>
+                            <td>${opportunity.title}</td>
+                            <td><span class="badge bg-primary">${opportunity.categoryName}</span></td>
+                            <td><span class="badge bg-${getUrgencyClass(opportunity.urgency)}">${opportunity.urgency}</span></td>
+                            <td><span class="badge bg-${getStatusClass(opportunity.status)}">${opportunity.status}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewOpportunity('${opportunity.id}')">View</button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="saveToShortlist('${opportunity.id}')">Save</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table></div>';
+                opportunitiesList.innerHTML = html;
+            } else {
+                opportunitiesList.innerHTML = '<p class="text-muted">No opportunities found.</p>';
+            }
+        }
+        
+        // Display Shortlist
+        function displayShortlist(shortlistItems) {
+            // Similar implementation for shortlist
+            console.log('Displaying shortlist:', shortlistItems);
+        }
+        
+        // Display History
+        function displayHistory(historyItems) {
+            // Similar implementation for history
+            console.log('Displaying history:', historyItems);
+        }
+        
+        // Utility functions
+        function getUrgencyClass(urgency) {
+            const classes = { 'critical': 'danger', 'high': 'warning', 'medium': 'info', 'low': 'success' };
+            return classes[urgency] || 'secondary';
+        }
+        
+        function getStatusClass(status) {
+            const classes = { 'pending': 'warning', 'assigned': 'info', 'completed': 'success' };
+            return classes[status] || 'secondary';
+        }
+        
+        function showError(message) {
+            // Show error message to user
+            alert('Error: ' + message);
+        }
+    </script>
 </body>
 </html>

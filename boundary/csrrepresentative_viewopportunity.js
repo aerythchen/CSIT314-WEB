@@ -8,19 +8,7 @@ class Csrrepresentative_viewopportunityBoundary {
     async handleViewOpportunity(data) {
         const result = await this.controller.viewOpportunity(data);
         
-        // If successful and has opportunity data, render view
-        if (result.success && result.data && result.data.opportunity) {
-            return {
-                success: true,
-                renderView: 'csrrepresentative/opportunity_details',
-                viewData: {
-                    opportunity: result.data.opportunity,
-                    success: result.message,
-                    error: null
-                }
-            };
-        }
-        
+        // Return JSON response
         return result;
     }
 
