@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS requests (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     urgency VARCHAR(50) DEFAULT 'medium' CHECK (urgency IN ('low', 'medium', 'high', 'critical')),
-    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'completed')),
+    status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'assigned', 'completed')),
     viewcount INTEGER DEFAULT 0,
     shortlistcount INTEGER DEFAULT 0,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

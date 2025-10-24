@@ -43,52 +43,21 @@ class Personinneed_createrequestBoundary {
     validateRequestData(data) {
         const { title, description, category, urgency } = data;
         
-        // Validate title
+        // Essential database requirements only
         if (!title || title.trim() === "") {
-            return {
-                isValid: false,
-                error: "Request title is required"
-            };
+            return { isValid: false, error: "Title is required" };
         }
         
-        if (title.trim().length < 5) {
-            return {
-                isValid: false,
-                error: "Title must be at least 5 characters"
-            };
+        if (!description || description.trim() === "") {
+            return { isValid: false, error: "Description is required" };
         }
         
-        if (title.length > 200) {
-            return {
-                isValid: false,
-                error: "Title cannot exceed 200 characters"
-            };
+        if (!category) {
+            return { isValid: false, error: "Category is required" };
         }
         
-        // Validate description (optional)
-        if (description && description.trim().length > 0 && description.trim().length < 10) {
-            return {
-                isValid: false,
-                error: "Description must be at least 10 characters if provided"
-            };
-        }
-        
-        // Validate category
-        const validCategories = ["Food", "Shelter", "Medical", "Education", "Employment", "Other"];
-        if (!category || !validCategories.includes(category)) {
-            return {
-                isValid: false,
-                error: "Please select a valid category"
-            };
-        }
-        
-        // Validate urgency
-        const validUrgencies = ["low", "medium", "high", "critical"];
-        if (!urgency || !validUrgencies.includes(urgency)) {
-            return {
-                isValid: false,
-                error: "Please select a valid urgency level"
-            };
+        if (!urgency) {
+            return { isValid: false, error: "Urgency level is required" };
         }
         
         return { isValid: true };

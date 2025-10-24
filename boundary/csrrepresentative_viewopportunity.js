@@ -12,6 +12,7 @@ class Csrrepresentative_viewopportunityBoundary {
         return result;
     }
 
+    // additional function to accept request
     async handleAcceptRequest(data) {
         const { requestId } = data;
         

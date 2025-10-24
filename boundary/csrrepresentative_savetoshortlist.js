@@ -6,8 +6,8 @@ class Csrrepresentative_savetoshortlistBoundary {
     }
 
     async handleSaveToShortlist(data) {
-        // Call controller directly
-        return await this.controller.saveToShortlist(data);
+        const result = await this.controller.saveToShortlist(data);
+        return result;
     }
 
 }

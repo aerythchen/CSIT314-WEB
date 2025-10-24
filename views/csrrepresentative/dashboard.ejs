@@ -9,395 +9,520 @@
     <link href="/css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <%- include('../partials/header', { title: 'CSR Representative Dashboard', user: user }) %>
-    
-    <div class="container-fluid">
+    <%- include('../partials/header', { title: 'CSR Representative Dashboard' }) %>
+
+    <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-12">
-                <h2><i class="fas fa-user-tie"></i> Welcome, <%= user.name %></h2>
-                <p>Manage opportunities and help those in need</p>
-                
-                <% if (error) { %>
-                    <div class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-triangle"></i> <%= error %>
-                    </div>
-                <% } %>
-                
-                <% if (success) { %>
-                    <div class="alert alert-success" role="alert">
-                        <i class="fas fa-check-circle"></i> <%= success %>
-                    </div>
-                <% } %>
-                
-                <!-- Quick Actions -->
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-list fa-3x text-primary mb-3"></i>
-                                <h5>View Requests</h5>
-                                <button type="button" class="btn btn-primary" onclick="viewAllOpportunities()">View All</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-star fa-3x text-warning mb-3"></i>
-                                <h5>View Shortlist</h5>
-                                <button type="button" class="btn btn-warning" onclick="viewShortlist()">View Shortlist</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-history fa-3x text-info mb-3"></i>
-                                <h5>View History</h5>
-                                <button type="button" class="btn btn-info" onclick="viewHistory()">View History</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Search Opportunities Section -->
-                <div class="card mb-4" id="search-section">
-                    <div class="card-header">
-                        <h5><i class="fas fa-search"></i> Search Opportunities</h5>
-                    </div>
+                <h2><i class="fas fa-tachometer-alt"></i> CSR Representative Dashboard</h2>
+                <p class="text-muted">Manage opportunities, shortlist, and match history</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
                     <div class="card-body">
-                        <form id="searchForm" onsubmit="searchOpportunities(event)">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="searchTerm" class="form-label">Search Term</label>
-                                    <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Search opportunities">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="category" class="form-label">Category</label>
-                                    <select class="form-select" id="category" name="category">
-                                        <option value="">All Categories</option>
-                                        <option value="Food Assistance">Food Assistance</option>
-                                        <option value="Housing Support">Housing Support</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="urgency" class="form-label">Urgency</label>
-                                    <select class="form-select" id="urgency" name="urgency">
-                                        <option value="">All Urgency</option>
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="critical">Critical</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> Search Opportunities
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Opportunities List -->
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Available Opportunities</h5>
-                        <form action="/bce/csrrepresentative_searchopportunity/searchOpportunity" method="POST" class="d-inline">
-                            <input type="hidden" name="userId" value="<%= user.id %>">
-                            <input type="hidden" name="searchTerm" value="">
-                            <input type="hidden" name="category" value="">
-                            <input type="hidden" name="urgency" value="">
-                            <button type="submit" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-refresh"></i> Refresh
-                            </button>
-                        </form>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> 
-                            Click "View All Requests" above to see all available opportunities, or use the search form to filter results.
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Shortlist Management Section -->
-                <div class="card mb-4" id="shortlist-section">
-                    <div class="card-header">
-                        <h5><i class="fas fa-star"></i> My Shortlist</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <form action="/csrrepresentative/shortlist-results" method="GET">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="searchTerm" placeholder="Search shortlist">
-                                        <button type="submit" class="btn btn-outline-secondary">
-                                            <i class="fas fa-search"></i> Search
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-md-6">
-                                <a href="/csrrepresentative/shortlist-results" class="btn btn-warning">
-                                    <i class="fas fa-list"></i> View All Shortlist
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> 
-                            Use the "View All Shortlist" button above to see your saved opportunities.
+                        <h5 class="card-title">Quick Actions</h5>
+                        <div class="d-flex gap-2">
+                            <a href="#searchSection" class="btn btn-primary btn-sm">
+                                <i class="fas fa-search"></i> Search Opportunities
+                            </a>
+                            <a href="#shortlistSection" class="btn btn-warning btn-sm">
+                                <i class="fas fa-star"></i> View Shortlist
+                            </a>
+                            <a href="#historySection" class="btn btn-info btn-sm">
+                                <i class="fas fa-history"></i> View History
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Match History Section -->
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-history"></i> Match History
-                        </h5>
+        <!-- Search Opportunities Section -->
+        <div class="row mb-4" id="searchSection">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-search"></i> Search Opportunities</h5>
                     </div>
                     <div class="card-body">
-                        <!-- View All History -->
-                        <a href="/csrrepresentative/history-results" class="btn btn-info w-100 mb-4">
-                            <i class="fas fa-list"></i> View All Match History
-                        </a>
-
-                        <hr>
-
-                        <!-- Search History -->
-                        <h6 class="mb-3">Search History</h6>
-                        <form action="/csrrepresentative/history-results" method="GET">
-                            <div class="mb-3">
-                                <label for="searchTerm" class="form-label">Search Term</label>
-                                <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Search by title or description...">
+                        <!-- Search Form -->
+                        <form id="searchForm" class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="searchTerm" placeholder="Search opportunities...">
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="category" class="form-label">Category</label>
-                                    <select class="form-select" id="category" name="category">
-                                        <option value="">All Categories</option>
-                                        <option value="Food Assistance">Food Assistance</option>
-                                        <option value="Housing Support">Housing Support</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="urgency" class="form-label">Urgency</label>
-                                    <select class="form-select" id="urgency" name="urgency">
-                                        <option value="">All Urgency</option>
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="critical">Critical</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Match Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="">All Status</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="cancelled">Cancelled</option>
+                            <div class="col-md-2">
+                                <select class="form-select" id="searchCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Shelter">Shelter</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Education">Education</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-outline-info w-100">
-                                <i class="fas fa-search"></i> Search History
-                            </button>
+                            <div class="col-md-2">
+                                <select class="form-select" id="searchUrgency">
+                                    <option value="">All Urgency</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-primary w-100" onclick="handleSearch()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100" onclick="loadDashboard()">
+                                    <i class="fas fa-refresh"></i> Refresh
+                                </button>
+                            </div>
                         </form>
+                        
+                        <!-- Search Results -->
+                        <div id="search-results" class="row">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shortlist Section -->
+        <div class="row mb-4" id="shortlistSection">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-star"></i> My Shortlist</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Shortlist Search Form -->
+                        <form class="row g-3 mb-3">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="shortlistSearchTerm" placeholder="Search shortlist...">
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="shortlistCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Shelter">Shelter</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Education">Education</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="shortlistUrgency">
+                                    <option value="">All Urgency</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-warning w-100" onclick="handleShortlistSearch()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100" onclick="viewShortlist()">
+                                    <i class="fas fa-list"></i> View All
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div id="shortlist-results" class="row">
+                            <!-- Shortlist items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="row mb-4" id="historySection">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Match History</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- History Search Form -->
+                        <form class="row g-3 mb-3">
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" id="historySearchTerm" placeholder="Search history...">
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="historyCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Shelter">Shelter</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Education">Education</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="historyStatus">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="assigned">Assigned</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-info w-100" onclick="handleHistorySearch()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100" onclick="viewHistory()">
+                                    <i class="fas fa-list"></i> View All
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div id="history-results" class="row">
+                            <!-- History items will be populated here -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <%- include('../partials/footer') %>
-    
+
     <script>
-        // CSR Dashboard AJAX Functions
         
-        // View All Opportunities
-        async function viewAllOpportunities() {
-            try {
-                const formData = new FormData();
-                formData.append('searchTerm', '');
-                formData.append('category', '');
-                formData.append('urgency', '');
-                formData.append('viewAll', 'true');
-                
-                const response = await fetch('/bce/csrrepresentative_searchopportunity/searchOpportunity', {
-                    method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayOpportunities(data.data.opportunities);
-                } else {
-                    showError(data.error || 'Failed to load opportunities');
-                }
-            } catch (error) {
-                console.error('Error loading opportunities:', error);
-                showError('Failed to load opportunities');
-            }
+        // Optimized Dashboard - Using existing BCEs properly
+        
+        // Simplified Dashboard - Let BCEs handle everything
+        async function loadDashboard() {
+            await Promise.all([
+                apiCall('csrrepresentative_searchopportunity/searchOpportunity', { searchTerm: '', category: '', urgency: '' }).then(displayOpportunities),
+                apiCall('csrrepresentative_viewshortlist/viewShortlist', { userId: '<%= user.id %>' }).then(displayShortlist),
+                apiCall('csrrepresentative_viewhistory/viewHistory', { userId: '<%= user.id %>' }).then(displayHistory)
+            ]);
         }
         
-        // Search Opportunities
-        async function searchOpportunities(event) {
-            event.preventDefault();
+        // Generic Action Handler
+        async function handleAction(action, data) {
+            const response = await apiCall(`csrrepresentative_${action}`, data);
             
-            try {
-                const formData = new FormData(event.target);
-                
-                const response = await fetch('/bce/csrrepresentative_searchopportunity/searchOpportunity', {
-                    method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayOpportunities(data.data.opportunities);
-                } else {
-                    showError(data.error || 'Search failed');
+            if (response.success) {
+                showSuccess(response.message || 'Action completed!');
+                // Refresh relevant sections with retry logic
+                if (action.includes('shortlist')) {
+                    setTimeout(() => refreshShortlistWithRetry(), 200);
                 }
-            } catch (error) {
-                console.error('Error searching opportunities:', error);
-                showError('Search failed');
-            }
-        }
-        
-        // View Shortlist
-        async function viewShortlist() {
-            try {
-                const formData = new FormData();
-                formData.append('userId', '<%= user.id %>');
-                
-                const response = await fetch('/bce/csrrepresentative_viewshortlist/viewShortlist', {
-                    method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayShortlist(data.data.shortlistItems);
-                } else {
-                    showError(data.error || 'Failed to load shortlist');
+                if (action.includes('history')) {
+                    setTimeout(() => viewHistory(), 100);
                 }
-            } catch (error) {
-                console.error('Error loading shortlist:', error);
-                showError('Failed to load shortlist');
-            }
-        }
-        
-        // View History
-        async function viewHistory() {
-            try {
-                const formData = new FormData();
-                formData.append('userId', '<%= user.id %>');
-                
-                const response = await fetch('/bce/csrrepresentative_viewhistory/viewHistory', {
-                    method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayHistory(data.data.historyItems);
-                } else {
-                    showError(data.error || 'Failed to load history');
+                if (action.includes('opportunity')) {
+                    setTimeout(() => loadDashboard(), 100);
                 }
-            } catch (error) {
-                console.error('Error loading history:', error);
-                showError('Failed to load history');
-            }
-        }
-        
-        // Display Opportunities
-        function displayOpportunities(opportunities) {
-            const resultsContainer = document.getElementById('search-results');
-            if (!resultsContainer) {
-                // Create results container if it doesn't exist
-                const searchSection = document.getElementById('search-section');
-                const resultsDiv = document.createElement('div');
-                resultsDiv.id = 'search-results';
-                resultsDiv.className = 'card mt-4';
-                resultsDiv.innerHTML = `
-                    <div class="card-header">
-                        <h5><i class="fas fa-list"></i> Search Results</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="opportunities-list"></div>
-                    </div>
-                `;
-                searchSection.parentNode.insertBefore(resultsDiv, searchSection.nextSibling);
-            }
-            
-            const opportunitiesList = document.getElementById('opportunities-list');
-            if (opportunities && opportunities.length > 0) {
-                let html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Title</th><th>Category</th><th>Urgency</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-                
-                opportunities.forEach(opportunity => {
-                    html += `
-                        <tr>
-                            <td>${opportunity.title}</td>
-                            <td><span class="badge bg-primary">${opportunity.categoryName}</span></td>
-                            <td><span class="badge bg-${getUrgencyClass(opportunity.urgency)}">${opportunity.urgency}</span></td>
-                            <td><span class="badge bg-${getStatusClass(opportunity.status)}">${opportunity.status}</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="viewOpportunity('${opportunity.id}')">View</button>
-                                <button class="btn btn-sm btn-outline-warning" onclick="saveToShortlist('${opportunity.id}')">Save</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table></div>';
-                opportunitiesList.innerHTML = html;
             } else {
-                opportunitiesList.innerHTML = '<p class="text-muted">No opportunities found.</p>';
+                showError(response.error);
             }
         }
         
-        // Display Shortlist
-        function displayShortlist(shortlistItems) {
-            // Similar implementation for shortlist
-            console.log('Displaying shortlist:', shortlistItems);
+        // Retry logic for shortlist refresh
+        async function refreshShortlistWithRetry(retries = 3) {
+            try {
+                const response = await apiCall('csrrepresentative_viewshortlist/viewShortlist', { userId: '<%= user.id %>' });
+                if (response.success) {
+                    displayShortlist(response);
+                } else if (retries > 0) {
+                    // Retry after delay if failed
+                    setTimeout(() => refreshShortlistWithRetry(retries - 1), 500);
+                } else {
+                    console.log('Shortlist refresh failed after retries');
+                }
+            } catch (error) {
+                if (retries > 0) {
+                    setTimeout(() => refreshShortlistWithRetry(retries - 1), 500);
+                } else {
+                    console.error('Shortlist refresh error:', error);
+                }
+            }
         }
         
-        // Display History
-        function displayHistory(historyItems) {
-            // Similar implementation for history
-            console.log('Displaying history:', historyItems);
+        // Specific Action Functions (simplified)
+        async function saveToShortlist(requestId) {
+            await handleAction('savetoshortlist/saveToShortlist', { userId: '<%= user.id %>', requestId });
         }
         
-        // Utility functions
-        function getUrgencyClass(urgency) {
-            const classes = { 'critical': 'danger', 'high': 'warning', 'medium': 'info', 'low': 'success' };
-            return classes[urgency] || 'secondary';
+        async function removeFromShortlist(requestId) {
+            await handleAction('removeshortlist/removeFromShortlist', { userId: '<%= user.id %>', requestId });
         }
         
-        function getStatusClass(status) {
-            const classes = { 'pending': 'warning', 'assigned': 'info', 'completed': 'success' };
-            return classes[status] || 'secondary';
+        async function acceptRequest(requestId) {
+            await handleAction('viewopportunity/acceptRequest', { userId: '<%= user.id %>', requestId, serviceType: 'general' });
         }
         
+        async function completeMatch(matchId) {
+            await handleAction('viewhistory/completeMatch', { userId: '<%= user.id %>', matchId, notes: '' });
+        }
+        
+        // Search and View Functions (simplified)
+        async function searchOpportunities(filters) {
+            const response = await apiCall('csrrepresentative_searchopportunity/searchOpportunity', filters);
+            displayOpportunities(response);
+        }
+        
+        async function searchShortlist(filters) {
+            const response = await apiCall('csrrepresentative_searchshortlist/searchShortlist', { userId: '<%= user.id %>', ...filters });
+            displayShortlist(response);
+        }
+        
+        async function searchHistory(filters) {
+            const response = await apiCall('csrrepresentative_searchhistory/searchHistory', { userId: '<%= user.id %>', ...filters });
+            displayHistory(response);
+        }
+        
+        async function viewShortlist() {
+            const response = await apiCall('csrrepresentative_viewshortlist/viewShortlist', { userId: '<%= user.id %>' });
+            displayShortlist(response);
+        }
+        
+        async function viewHistory() {
+            const response = await apiCall('csrrepresentative_viewhistory/viewHistory', { userId: '<%= user.id %>' });
+            displayHistory(response);
+        }
+        
+        // Generic API Call Function
+        async function apiCall(endpoint, data) {
+            const formData = new FormData();
+            Object.keys(data).forEach(key => formData.append(key, data[key]));
+            
+            const response = await fetch(`/bce/${endpoint}`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            return await response.json();
+        }
+        
+        // Display Functions (Handle BCE responses directly)
+        function displayOpportunities(response) {
+            const container = document.getElementById('search-results');
+            if (!container) return;
+            
+            if (!response.success || !response.data?.opportunities) {
+                container.innerHTML = '<div class="text-center py-5"><h5>No opportunities found</h5></div>';
+                return;
+            }
+            
+            const opportunities = response.data.opportunities;
+            if (opportunities.length === 0) {
+                container.innerHTML = '<div class="text-center py-5"><h5>No opportunities found</h5></div>';
+                return;
+            }
+            
+            container.innerHTML = opportunities.map(item => renderCard(item, 'opportunity')).join('');
+        }
+        
+        function displayShortlist(response) {
+            const container = document.getElementById('shortlist-results');
+            if (!container) return;
+            
+            if (!response.success || !response.data?.shortlistItems) {
+                container.innerHTML = '<div class="text-center py-5"><h5>No shortlist items</h5></div>';
+                return;
+            }
+            
+            const shortlist = response.data.shortlistItems;
+            if (shortlist.length === 0) {
+                container.innerHTML = '<div class="text-center py-5"><h5>No shortlist items</h5></div>';
+                return;
+            }
+            
+            container.innerHTML = shortlist.map(item => renderCard(item, 'shortlist')).join('');
+        }
+        
+        function displayHistory(response) {
+            const container = document.getElementById('history-results');
+            if (!container) return;
+            
+            if (!response.success || !response.data?.historyItems) {
+                container.innerHTML = '<div class="text-center py-5"><h5>No history items</h5></div>';
+                return;
+            }
+            
+            const history = response.data.historyItems;
+            if (history.length === 0) {
+                container.innerHTML = '<div class="text-center py-5"><h5>No history items</h5></div>';
+                return;
+            }
+            
+            container.innerHTML = history.map(item => renderCard(item, 'history')).join('');
+        }
+        
+        function renderCard(item, type) {
+            // Use the formatted data from BCE
+            return `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body position-relative">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0">${item.title}</h6>
+                                <span class="badge ${item.statusBadge || 'bg-secondary'}">${item.status || 'Unknown'}</span>
+                            </div>
+                            <p class="card-text">${item.description}</p>
+                            <div class="d-flex gap-2">
+                                ${getActionButtons(item, type)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getActionButtons(item, type) {
+            const buttons = {
+                opportunity: [
+                    `<button class="btn btn-sm btn-primary" onclick="viewOpportunity('${item.id}')">View</button>`,
+                    `<button class="btn btn-sm btn-warning" onclick="saveToShortlist('${item.id}')">Save</button>`,
+                    `<button class="btn btn-sm btn-success" onclick="acceptRequest('${item.id}')">Accept</button>`
+                ],
+                shortlist: [
+                    `<button class="btn btn-sm btn-primary" onclick="viewShortlistItem('${item.id}')">View</button>`,
+                    `<button class="btn btn-sm btn-success" onclick="acceptRequest('${item.id}')">Accept</button>`,
+                    `<button class="btn btn-sm btn-danger" onclick="removeFromShortlist('${item.id}')">Remove</button>`
+                ],
+                history: [
+                    `<button class="btn btn-sm btn-primary" onclick="viewHistoryDetails('${item.matchId}')">View</button>`,
+                    ...(item.requestStatus === 'assigned' ? [`<button class="btn btn-sm btn-success" onclick="completeMatch('${item.matchId}')">Complete</button>`] : [])
+                ]
+            };
+            
+            return buttons[type]?.join('') || '';
+        }
+
+        // Search Handlers
+        async function handleSearch() {
+            const searchTerm = document.getElementById('searchTerm').value;
+            const category = document.getElementById('searchCategory').value;
+            const urgency = document.getElementById('searchUrgency').value;
+            
+            await searchOpportunities({
+                searchTerm: searchTerm,
+                category: category,
+                urgency: urgency
+            });
+        }
+        
+        async function handleShortlistSearch() {
+            const searchTerm = document.getElementById('shortlistSearchTerm').value;
+            const category = document.getElementById('shortlistCategory').value;
+            const urgency = document.getElementById('shortlistUrgency').value;
+            
+            await searchShortlist({
+                searchTerm: searchTerm,
+                category: category,
+                urgency: urgency
+            });
+        }
+        
+        async function handleHistorySearch() {
+            const searchTerm = document.getElementById('historySearchTerm').value;
+            const category = document.getElementById('historyCategory').value;
+            const status = document.getElementById('historyStatus').value;
+            
+            await searchHistory({
+                searchTerm: searchTerm,
+                category: category,
+                status: status
+            });
+        }
+        
+        // Utility Functions
         function showError(message) {
-            // Show error message to user
             alert('Error: ' + message);
         }
+        
+        function showSuccess(message) {
+            alert('Success: ' + message);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
+        
+        // Ultra-Compact Modal System
+        async function viewOpportunity(requestId) {
+            const response = await apiCall('csrrepresentative_viewopportunity/viewOpportunity', { opportunityId: requestId, userId: '<%= user.id %>' });
+            response.success ? showDetailsModal(response.data.opportunity, 'opportunity') : showError(response.error);
+        }
+        
+        async function viewShortlistItem(requestId) {
+            const response = await apiCall('csrrepresentative_viewshortlist/viewShortlist', { userId: '<%= user.id %>' });
+            const item = response.success ? response.data.shortlistItems.find(item => item.id === requestId) : null;
+            item ? showDetailsModal(item, 'shortlist') : showError(response.success ? 'Shortlist item not found' : response.error);
+        }
+        
+        async function viewHistoryDetails(matchId) {
+            const response = await apiCall('csrrepresentative_viewhistory/viewHistory', { userId: '<%= user.id %>' });
+            const match = response.success ? response.data.historyItems.find(item => item.matchId === matchId) : null;
+            match ? showDetailsModal(match, 'history') : showError(response.success ? 'Match not found' : response.error);
+        }
+        
+        function showDetailsModal(data, type) {
+            const isHistory = type === 'history';
+            const status = data.status || data.requestStatus;
+            const date = new Date(data.createdAt || data.requestCreatedAt || data.matchCreatedAt).toLocaleDateString();
+            
+            document.body.insertAdjacentHTML('beforeend', `
+                <div class="modal fade" id="detailsModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-${isHistory ? 'handshake' : 'eye'}"></i> ${isHistory ? 'Match' : 'Opportunity'} Details
+                                    <span class="badge bg-${getClass(status, { 'pending': 'warning', 'assigned': 'info', 'completed': 'success' })} ms-2">${status}</span>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6 class="fw-bold">${data.title}</h6>
+                                        <p class="text-muted">${data.description || 'No description available'}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-2"><span class="badge bg-${getClass(data.urgency, { 'critical': 'danger', 'high': 'warning', 'medium': 'info', 'low': 'success' })}">${getIcon(data.urgency)} ${data.urgency}</span></div>
+                                        <div class="mb-2"><span class="badge bg-primary">${data.categoryName}</span></div>
+                                        <div class="mb-2"><span class="badge bg-${getClass(status, { 'pending': 'warning', 'assigned': 'info', 'completed': 'success' })}">${status}</span></div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6"><strong>Created by:</strong> ${data.createdByName || 'Unknown'}</div>
+                                    <div class="col-md-6"><strong>Created:</strong> ${date}</div>
+                                </div>
+                                ${isHistory ? `<div class="row mt-3"><div class="col-md-6"><strong>Service Type:</strong> ${data.serviceType || 'General Assistance'}</div><div class="col-md-6"><strong>Match Created:</strong> ${new Date(data.matchCreatedAt).toLocaleDateString()}</div></div>` : ''}
+                                ${data.notes ? `<div class="row mt-3"><div class="col-12"><strong>Notes:</strong><p class="text-muted">${data.notes}</p></div></div>` : ''}
+                            </div>
+                            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            new bootstrap.Modal(document.getElementById('detailsModal')).show();
+        }
+        
+        function getClass(value, classes) { return classes[value] || 'secondary'; }
+        function getIcon(urgency) { return { 'critical': '🚨', 'high': '⚠️', 'medium': '⚡', 'low': '📋' }[urgency] || '📋'; }
+        
+        
     </script>
 </body>
 </html>

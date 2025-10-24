@@ -245,6 +245,57 @@ class Match {
             data: stats
         };
     }
+
+    // ========================================
+    // SHORTLIST MANAGEMENT
+    // ========================================
+    
+    async addToShortlist(requestId, csrId) {
+        const shortlistItem = {
+            id: `shortlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            requestId: requestId,
+            userId: csrId,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            isDeleted: false
+        };
+
+        const result = await db.insert('shortlists', shortlistItem);
+        return result;
+    }
+
+    async removeFromShortlist(requestId, csrId) {
+        const shortlistItem = await db.findOne('shortlists', { 
+            requestId: requestId, 
+            userId: csrId, 
+            isDeleted: false 
+        });
+        
+        if (!shortlistItem) {
+            return { success: false, error: "Item not found in shortlist" };
+        }
+
+        const result = await db.update('shortlists', shortlistItem.id, {
+            isDeleted: true,
+            updatedAt: new Date().toISOString()
+        });
+
+        return result;
+    }
+
+    async getShortlist(csrId) {
+        const shortlistItems = await db.findAll('shortlists', { 
+            userId: csrId, 
+            isDeleted: false 
+        });
+
+        return {
+            success: true,
+            data: shortlistItems,
+            count: shortlistItems.length
+        };
+    }
 }
 
 module.exports = Match;

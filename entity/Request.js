@@ -185,15 +185,11 @@ class Request {
 				queryParams.push(urgency);
 			}
 			
-			// Exclude requests that have already been accepted (have matches) or saved to shortlist
+			// Exclude requests that have already been accepted (have matches)
 			query += ` AND r.id NOT IN (
 				SELECT DISTINCT m.requestId 
 				FROM matches m 
 				WHERE m.isDeleted = false
-			) AND r.id NOT IN (
-				SELECT DISTINCT s.requestId 
-				FROM shortlists s 
-				WHERE s.isActive = true AND s.isDeleted = false
 			)`;
 			
 			query += ` ORDER BY r.createdAt DESC`;
@@ -791,7 +787,6 @@ class Request {
                 SELECT 
                     m.id as matchId,
                     m.serviceType,
-                    m.status as matchStatus,
                     m.completedAt,
                     m.notes,
                     m.createdAt as matchCreatedAt,
@@ -822,7 +817,6 @@ class Request {
             const historyItems = result.rows.map(row => ({
                 matchId: row.matchid,
                 serviceType: row.servicetype,
-                matchStatus: row.matchstatus,
                 completedAt: row.completedat,
                 notes: row.notes,
                 matchCreatedAt: row.matchcreatedat,
@@ -864,7 +858,6 @@ class Request {
                 SELECT 
                     m.id as matchId,
                     m.serviceType,
-                    m.status as matchStatus,
                     m.completedAt,
                     m.notes,
                     m.createdAt as matchCreatedAt,
@@ -912,10 +905,10 @@ class Request {
                 params.push(urgency.trim());
             }
             
-            // Add status filter
+            // Add status filter (using request status, not match status)
             if (status && status.trim()) {
                 paramCount++;
-                query += ` AND m.status = $${paramCount}`;
+                query += ` AND r.status = $${paramCount}`;
                 params.push(status.trim());
             }
             
@@ -927,7 +920,6 @@ class Request {
             const historyItems = result.rows.map(row => ({
                 matchId: row.matchid,
                 serviceType: row.servicetype,
-                matchStatus: row.matchstatus,
                 completedAt: row.completedat,
                 notes: row.notes,
                 matchCreatedAt: row.matchcreatedat,
@@ -1078,16 +1070,25 @@ class Request {
             
             const match = matchResult.rows[0];
             
-            // Check if already completed
-            if (match.status === 'completed') {
-                return { success: false, error: "This match is already completed" };
+            // Check if request is already completed
+            const requestQuery = `
+                SELECT status FROM requests WHERE id = $1
+            `;
+            const requestResult = await this.db.pool.query(requestQuery, [match.requestid]);
+            
+            if (requestResult.rows.length === 0) {
+                return { success: false, error: "Request not found" };
             }
             
-            // Update match status to completed
+            if (requestResult.rows[0].status === 'completed') {
+                return { success: false, error: "This request is already completed" };
+            }
+            
+            // Update match with completion details
             const updateQuery = `
                 UPDATE matches 
-                SET status = $1, completedat = $2, notes = $3, updatedat = $4
-                WHERE id = $5 AND csrid = $6
+                SET completedat = $1, notes = $2, updatedat = $3
+                WHERE id = $4 AND csrid = $5
                 RETURNING *
             `;
             
@@ -1095,7 +1096,6 @@ class Request {
             const updatedAt = new Date().toISOString();
             
             const updateResult = await this.db.pool.query(updateQuery, [
-                'completed',
                 completedAt,
                 notes,
                 updatedAt,
