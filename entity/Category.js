@@ -112,6 +112,11 @@ class Category {
         };
     }
 
+    // Alias for viewCategory to match controller expectations
+    async viewCategory(data) {
+        return this.getAllCategories();
+    }
+
     getActiveCategories() {
         const categories = db.findAll('categories', { 
             status: 'active', 

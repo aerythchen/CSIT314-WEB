@@ -1,5 +1,6 @@
 const { db } = require('../database');
 const { RequestHelpers } = require('../database/helpers');
+const Match = require('./Match');
 
 /**
  * Request Entity - Handles request business logic
@@ -8,6 +9,7 @@ const { RequestHelpers } = require('../database/helpers');
 class Request {
     constructor() {
         this.db = db;
+        this.matchEntity = new Match();
     }
 
     // ========================================
@@ -993,35 +995,21 @@ class Request {
                 return { success: false, error: "You have already accepted this request" };
             }
             
-            // Create match entry
-            const matchId = `match_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            // Create match entry using Match entity
             const matchData = {
-                id: matchId,
                 requestId: requestId,
                 csrId: userId,
                 serviceType: serviceType,
-                status: 'pending',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                isDeleted: false
+                notes: ''
             };
             
-            const matchResult = await this.db.pool.query(`
-                INSERT INTO matches (id, requestid, csrid, servicetype, status, createdat, updatedat, isdeleted)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                RETURNING *
-            `, [
-                matchData.id,
-                matchData.requestId,
-                matchData.csrId,
-                matchData.serviceType,
-                matchData.status,
-                matchData.createdAt,
-                matchData.updatedAt,
-                matchData.isDeleted
-            ]);
+            const matchResult = this.matchEntity.createMatch(matchData);
             
-            console.log(`✅ Match created successfully: ${matchId}`);
+            if (!matchResult.success) {
+                return { success: false, error: matchResult.error };
+            }
+            
+            console.log(`✅ Match created successfully: ${matchResult.data.id}`);
             
             // Update request status from pending to assigned
             await this.db.pool.query(`
@@ -1035,13 +1023,13 @@ class Request {
             return {
                 success: true,
                 data: {
-                    matchId: matchId,
+                    matchId: matchResult.data.id,
                     requestId: requestId,
                     serviceType: serviceType,
                     status: 'assigned',
-                    createdAt: matchData.createdAt
+                    createdAt: matchResult.data.createdAt
                 },
-                message: `Request accepted and assigned successfully. Match created with ID: ${matchId}`
+                message: `Request accepted and assigned successfully. Match created with ID: ${matchResult.data.id}`
             };
             
         } catch (error) {
@@ -1084,24 +1072,14 @@ class Request {
                 return { success: false, error: "This request is already completed" };
             }
             
-            // Update match with completion details
-            const updateQuery = `
-                UPDATE matches 
-                SET completedat = $1, notes = $2, updatedat = $3
-                WHERE id = $4 AND csrid = $5
-                RETURNING *
-            `;
-            
+            // Update match with completion details using Match entity
             const completedAt = new Date().toISOString();
-            const updatedAt = new Date().toISOString();
             
-            const updateResult = await this.db.pool.query(updateQuery, [
-                completedAt,
-                notes,
-                updatedAt,
-                matchId,
-                userId
-            ]);
+            const updateResult = this.matchEntity.completeMatch(matchId, notes);
+            
+            if (!updateResult.success) {
+                return { success: false, error: updateResult.error };
+            }
             
             console.log(`✅ Match completed successfully: ${matchId}`);
             
@@ -1120,7 +1098,7 @@ class Request {
                     matchId: matchId,
                     requestId: match.requestid,
                     status: 'completed',
-                    completedAt: completedAt,
+                    completedAt: updateResult.data.completedAt,
                     notes: notes
                 },
                 message: `Match and request completed successfully. Request: ${match.title}`

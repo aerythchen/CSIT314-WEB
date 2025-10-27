@@ -5,7 +5,7 @@ class Personinneed_loginBoundary {
         this.controller = new personinneed_login();
     }
 
-    handleLogin(data) {
+    async handleLogin(data) {
         try {
             // Validate inputs
             const validationError = this.validateInputs(data);
@@ -14,7 +14,7 @@ class Personinneed_loginBoundary {
             }
             
             // Call controller with formatted data
-            const result = this.controller.login({
+            const result = await this.controller.login({
                 email: data.email,
                 password: data.password,
                 userType: 'personinneed'

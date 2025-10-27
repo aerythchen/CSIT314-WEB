@@ -173,25 +173,6 @@ app.get('/platformmanager/dashboard', (req, res) => {
     });
 });
 
-app.get('/platformmanager/categories', (req, res) => {
-    const error = req.query.error || null;
-    const success = req.query.success || null;
-    res.render('platformmanager/categories', { 
-        user: req.session.user || { name: 'Guest', id: null },
-        error: error,
-        success: success
-    });
-});
-
-app.get('/platformmanager/reports', (req, res) => {
-    const error = req.query.error || null;
-    const success = req.query.success || null;
-    res.render('platformmanager/reports', { 
-        user: req.session.user || { name: 'Guest', id: null },
-        error: error,
-        success: success
-    });
-});
 
 app.get('/useradmin/dashboard', (req, res) => {
     const error = req.query.error || null;
@@ -203,25 +184,6 @@ app.get('/useradmin/dashboard', (req, res) => {
     });
 });
 
-app.get('/useradmin/accounts', (req, res) => {
-    const error = req.query.error || null;
-    const success = req.query.success || null;
-    res.render('useradmin/accounts', { 
-        user: req.session.user || { name: 'Guest', id: null },
-        error: error,
-        success: success
-    });
-});
-
-app.get('/useradmin/profiles', (req, res) => {
-    const error = req.query.error || null;
-    const success = req.query.success || null;
-    res.render('useradmin/profiles', { 
-        user: req.session.user || { name: 'Guest', id: null },
-        error: error,
-        success: success
-    });
-});
 
 
 // API route to get categories
@@ -580,7 +542,6 @@ app.listen(PORT, async () => {
    - http://localhost:${PORT}/csrrepresentative/dashboard
    - http://localhost:${PORT}/csrrepresentative/search-requests
    - http://localhost:${PORT}/platformmanager/dashboard
-   - http://localhost:${PORT}/platformmanager/categories
    - http://localhost:${PORT}/useradmin/dashboard
  
  BCE Architecture:

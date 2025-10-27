@@ -5,43 +5,22 @@ class Platformmanager_createcategoryBoundary {
         this.controller = new platformmanager_createcategory();
     }
 
-    handleCreateCategory(data) {
-        // 1. DATA FORMATTING (UI Logic)
-        const formattedData = this.formatDataForController(data);
-        
-        // 2. CALL CONTROLLER
-        const result = this.controller.createCategory(formattedData);
-        
-        // 3. FORMAT RESPONSE FOR UI (UI Logic)
-        return this.formatResponseForUI(result);
-    }
-
-    handleFormSubmission(formData) {
-        return this.handleCreateCategory(formData);
-    }
-    
-    formatDataForController(uiData) {
-        // Format UI data for createcategory business logic
-        return {
-            categoryName: uiData.categoryName,
-            description: uiData.description,
-            createdBy: uiData.userId,
-            userType: 'platformmanager'
-        };
-    }
-    
-    formatResponseForUI(result) {
-        // Simple response formatting for UI
-        if (result.success) {
-            return {
-                success: true,
-                message: result.message || 'Operation successful',
-                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+    async handleCreateCategory(data) {
+        try {
+            // Format data and call controller - entity already returns proper response format
+            const formattedData = {
+                categoryName: data.categoryName,
+                description: data.description,
+                createdBy: data.userId,
+                userType: 'platformmanager'
             };
-        } else {
+            
+            return await this.controller.createCategory(formattedData);
+        } catch (error) {
+            console.error('Error in handleCreateCategory:', error);
             return {
                 success: false,
-                error: result.error
+                error: "Failed to create category: " + error.message
             };
         }
     }

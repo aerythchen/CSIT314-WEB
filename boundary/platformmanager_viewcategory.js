@@ -5,41 +5,20 @@ class Platformmanager_viewcategoryBoundary {
         this.controller = new platformmanager_viewcategory();
     }
 
-    handleViewCategory(data) {
-        // 1. DATA FORMATTING (UI Logic)
-        const formattedData = this.formatDataForController(data);
-        
-        // 2. CALL CONTROLLER
-        const result = this.controller.viewCategory(formattedData);
-        
-        // 3. FORMAT RESPONSE FOR UI (UI Logic)
-        return this.formatResponseForUI(result);
-    }
-
-    handleFormSubmission(formData) {
-        return this.handleViewCategory(formData);
-    }
-    
-    formatDataForController(uiData) {
-        // Format UI data for viewcategory business logic
-        return {
-            ...uiData,
-            userType: 'platformmanager'
-        };
-    }
-    
-    formatResponseForUI(result) {
-        // Simple response formatting for UI
-        if (result.success) {
-            return {
-                success: true,
-                message: result.message || 'Operation successful',
-                redirectUrl: result.redirectUrl || '/platformmanager/dashboard'
+    async handleViewCategory(data) {
+        try {
+            // Format data and call controller - entity already returns proper response format
+            const formattedData = {
+                ...data,
+                userType: 'platformmanager'
             };
-        } else {
+            
+            return await this.controller.viewCategory(formattedData);
+        } catch (error) {
+            console.error('Error in handleViewCategory:', error);
             return {
                 success: false,
-                error: result.error
+                error: "Failed to view categories: " + error.message
             };
         }
     }

@@ -20,8 +20,8 @@ class UserAccount {
         // Find user profile by email and user type
         const profile = await db.findOne('userProfiles', { 
             email: email, 
-            userType: userType,
-            isDeleted: false 
+            usertype: userType,
+            isdeleted: false 
         });
 
         if (!profile) {
@@ -35,7 +35,7 @@ class UserAccount {
 
         // Find associated account
         const account = await db.findOne('userAccounts', { 
-            profileId: profile.id
+            profileid: profile.id
         });
 
         if (!account) {
