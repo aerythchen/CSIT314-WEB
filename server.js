@@ -133,15 +133,6 @@ app.get('/personinneed/dashboard', (req, res) => {
     });
 });
 
-app.get('/personinneed/create-request', (req, res) => {
-    const error = req.query.error || null;
-    const success = req.query.success || null;
-    res.render('personinneed/create_request', { 
-        user: req.session.user || { name: 'Guest', id: null },
-        error: error,
-        success: success
-    });
-});
 
 app.get('/csrrepresentative/dashboard', (req, res) => {
     const error = req.query.error || null;
@@ -423,43 +414,6 @@ app.get('/api/search-users', async (req, res) => {
 });
 
 // Route to show edit request form
-app.get('/personinneed/edit-request/:requestId', async (req, res) => {
-    try {
-        if (!req.session.user || !req.session.user.id) {
-            return res.redirect('/');
-        }
-        
-        const { requestId } = req.params;
-        const { db } = require('./database');
-        
-        // Get the request details
-        const request = await db.findOne('requests', {
-            id: requestId,
-            createdby: req.session.user.id,
-            isdeleted: false
-        });
-        
-        if (!request) {
-            return res.status(404).render('error', {
-                title: 'Request Not Found',
-                message: 'The request you are trying to edit does not exist or you do not have permission to edit it.'
-            });
-        }
-        
-        res.render('personinneed/edit_request', {
-            title: 'Edit Request',
-            user: req.session.user,
-            request: request
-        });
-        
-    } catch (error) {
-        console.error('Error loading edit request page:', error);
-        res.status(500).render('error', {
-            title: 'Error',
-            message: 'An error occurred while loading the edit page.'
-        });
-    }
-});
 
 // Route to handle search requests
 app.post('/personinneed/search-requests', async (req, res) => {
@@ -538,7 +492,6 @@ app.listen(PORT, async () => {
  Available Views:
    - http://localhost:${PORT}/                    (Login page)
    - http://localhost:${PORT}/personinneed/dashboard
-   - http://localhost:${PORT}/personinneed/create-request
    - http://localhost:${PORT}/csrrepresentative/dashboard
    - http://localhost:${PORT}/csrrepresentative/search-requests
    - http://localhost:${PORT}/platformmanager/dashboard
