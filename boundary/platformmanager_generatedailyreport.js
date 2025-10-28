@@ -22,6 +22,24 @@ class Platformmanager_generatedailyreportBoundary {
             };
         }
     }
+    
+    //additional method over engineering here
+    async handleGetRequestTrends(data) {
+        try {
+            const formattedData = {
+                ...data,
+                userType: 'platformmanager'
+            };
+            
+            return await this.controller.getRequestTrends(formattedData);
+        } catch (error) {
+            console.error('Error in handleGetRequestTrends:', error);
+            return {
+                success: false,
+                error: "Failed to get request trends: " + error.message
+            };
+        }
+    }
 }
 
 module.exports = Platformmanager_generatedailyreportBoundary;

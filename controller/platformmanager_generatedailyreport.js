@@ -15,6 +15,15 @@ class GenerateDailyReportController {
         
         return await this.entity.getMatchStatistics(startDate, endDate);
     }
+
+    //additional method over engineering here
+    async getRequestTrends(data) {
+        console.log("GenerateDailyReportController: Processing request trends...");
+        
+        // Use Match entity to get request trends
+        const days = data.days || 30;
+        return await this.entity.getRequestTrends(days);
+    }
 }
 
 module.exports = GenerateDailyReportController;

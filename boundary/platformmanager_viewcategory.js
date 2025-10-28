@@ -22,6 +22,19 @@ class Platformmanager_viewcategoryBoundary {
             };
         }
     }
+
+    //additional method over engineering here
+    async handleGetCategoryRequestCount(data) {
+        try {
+            return await this.controller.getCategoryRequestCount(data);
+        } catch (error) {
+            console.error('Error in handleGetCategoryRequestCount:', error);
+            return {
+                success: false,
+                error: "Failed to get category request count: " + error.message
+            };
+        }
+    }
 }
 
 module.exports = Platformmanager_viewcategoryBoundary;

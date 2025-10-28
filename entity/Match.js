@@ -14,7 +14,7 @@ class Match {
     // MATCH CREATION
     // ========================================
     
-    createMatch(matchData) {
+    async createMatch(matchData) {
         const match = {
             id: `match_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             requestId: matchData.requestId,
@@ -28,7 +28,7 @@ class Match {
             isDeleted: false
         };
 
-        const result = db.insert('matches', match);
+        const result = await db.insert('matches', match);
         return result;
     }
 
@@ -36,8 +36,8 @@ class Match {
     // MATCH MANAGEMENT
     // ========================================
     
-    updateMatch(matchId, updateData) {
-        const match = db.findOne('matches', { id: matchId, isDeleted: false });
+    async updateMatch(matchId, updateData) {
+        const match = await db.findOne('matches', { id: matchId, isDeleted: false });
         
         if (!match) {
             return { success: false, error: "Match not found" };
@@ -49,12 +49,12 @@ class Match {
             updatedAt: new Date().toISOString()
         };
 
-        const result = db.update('matches', matchId, updatedMatch);
+        const result = await db.update('matches', matchId, updatedMatch);
         return result;
     }
 
-    getMatch(matchId) {
-        const match = db.findOne('matches', { id: matchId, isDeleted: false });
+    async getMatch(matchId) {
+        const match = await db.findOne('matches', { id: matchId, isDeleted: false });
         
         if (!match) {
             return { success: false, error: "Match not found" };
@@ -63,14 +63,14 @@ class Match {
         return { success: true, data: match };
     }
 
-    deleteMatch(matchId) {
-        const match = db.findOne('matches', { id: matchId, isDeleted: false });
+    async deleteMatch(matchId) {
+        const match = await db.findOne('matches', { id: matchId, isDeleted: false });
         
         if (!match) {
             return { success: false, error: "Match not found" };
         }
 
-        const result = db.update('matches', matchId, {
+        const result = await db.update('matches', matchId, {
             isDeleted: true,
             updatedAt: new Date().toISOString()
         });
@@ -82,8 +82,8 @@ class Match {
     // MATCH SEARCH
     // ========================================
     
-    searchMatches(searchTerm, serviceType, status, startDate, endDate) {
-        let matches = db.findAll('matches', { isDeleted: false });
+    async searchMatches(searchTerm, serviceType, status, startDate, endDate) {
+        let matches = await db.findAll('matches', { isDeleted: false });
 
         // Filter by service type
         if (serviceType && serviceType !== 'all') {
@@ -119,8 +119,8 @@ class Match {
         };
     }
 
-    getAllMatches() {
-        const matches = db.findAll('matches', { isDeleted: false });
+    async getAllMatches() {
+        const matches = await db.findAll('matches', { isDeleted: false });
 
         return {
             success: true,
@@ -152,8 +152,8 @@ class Match {
     // MATCH FILTERING
     // ========================================
     
-    getMatchesByRequest(requestId) {
-        const matches = db.findAll('matches', { 
+    async getMatchesByRequest(requestId) {
+        const matches = await db.findAll('matches', { 
             requestId: requestId, 
             isDeleted: false 
         });
@@ -165,8 +165,8 @@ class Match {
         };
     }
 
-    getMatchesByCSR(csrId) {
-        const matches = db.findAll('matches', { 
+    async getMatchesByCSR(csrId) {
+        const matches = await db.findAll('matches', { 
             csrId: csrId, 
             isDeleted: false 
         });
@@ -178,8 +178,8 @@ class Match {
         };
     }
 
-    getMatchesByStatus(status) {
-        const matches = db.findAll('matches', { 
+    async getMatchesByStatus(status) {
+        const matches = await db.findAll('matches', { 
             status: status, 
             isDeleted: false 
         });
@@ -191,8 +191,8 @@ class Match {
         };
     }
 
-    getCompletedMatches() {
-        const matches = db.findAll('matches', { 
+    async getCompletedMatches() {
+        const matches = await db.findAll('matches', { 
             status: 'completed', 
             isDeleted: false 
         });
@@ -204,8 +204,8 @@ class Match {
         };
     }
 
-    getPendingMatches() {
-        const matches = db.findAll('matches', { 
+    async getPendingMatches() {
+        const matches = await db.findAll('matches', { 
             status: 'pending', 
             isDeleted: false 
         });
@@ -221,8 +221,8 @@ class Match {
     // MATCH STATISTICS
     // ========================================
     
-    getMatchStatistics(startDate, endDate) {
-        let matches = db.findAll('matches', { isDeleted: false });
+    async getMatchStatistics(startDate, endDate) {
+        let matches = await db.findAll('matches', { isDeleted: false });
 
         // Filter by date range if provided
         if (startDate) {
@@ -244,6 +244,102 @@ class Match {
             success: true,
             data: stats
         };
+    }
+
+
+    //additional method over engineering here
+    async getRequestTrends(days = 30) {
+        try {
+            // Debug: Try different query methods
+            console.log('Trying db.findAll...');
+            const allRequests = await db.findAll('requests', { isDeleted: false });
+            console.log(`db.findAll result: ${allRequests.length} requests`);
+            
+            console.log('Trying db.find...');
+            const findRequests = await db.find('requests', { isDeleted: false });
+            console.log(`db.find result: ${findRequests.length} requests`);
+            
+            console.log('Trying db.find with no conditions...');
+            const allRequestsNoFilter = await db.find('requests', {});
+            console.log(`db.find (no filter) result: ${allRequestsNoFilter.length} requests`);
+            
+            if (allRequestsNoFilter.length > 0) {
+                console.log('Sample request:', allRequestsNoFilter[0]);
+                console.log('Request createdat:', allRequestsNoFilter[0].createdat);
+                console.log('Request isdeleted:', allRequestsNoFilter[0].isdeleted);
+            }
+
+            // Use the working query method
+            const requestsToUse = allRequestsNoFilter.length > 0 ? allRequestsNoFilter : allRequests;
+            console.log(`Using ${requestsToUse.length} requests for trends`);
+
+            // Get requests from the last N days
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - days);
+
+            console.log(`Looking for requests between ${startDate.toISOString()} and ${endDate.toISOString()}`);
+
+            // Filter requests within the date range
+            const filteredRequests = requestsToUse.filter(req => {
+                const reqDate = new Date(req.createdat);
+                return reqDate >= startDate && reqDate <= endDate;
+            });
+
+            console.log(`Filtered requests: ${filteredRequests.length}`);
+
+            // Group by day
+            const dailyCounts = {};
+            for (let i = 0; i < days; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                dailyCounts[dateStr] = 0;
+            }
+
+            // Count requests per day
+            filteredRequests.forEach(req => {
+                const reqDate = new Date(req.createdat).toISOString().split('T')[0];
+                if (dailyCounts.hasOwnProperty(reqDate)) {
+                    dailyCounts[reqDate]++;
+                }
+            });
+
+            // Convert to arrays for chart
+            const labels = [];
+            const data = [];
+            
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const monthDay = (date.getMonth() + 1) + '/' + date.getDate();
+                
+                labels.push(monthDay);
+                data.push(dailyCounts[dateStr] || 0);
+            }
+
+            console.log(`Request trends: Found ${filteredRequests.length} requests in last ${days} days`);
+            console.log('Daily counts:', dailyCounts);
+
+            return {
+                success: true,
+                data: {
+                    labels: labels,
+                    data: data
+                }
+            };
+        } catch (error) {
+            console.error('Error getting request trends:', error);
+            return {
+                success: false,
+                error: error.message,
+                data: {
+                    labels: [],
+                    data: []
+                }
+            };
+        }
     }
 
     // ========================================

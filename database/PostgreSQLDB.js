@@ -124,6 +124,11 @@ class PostgreSQLDB {
         }
     }
 
+    async findAll(tableName, conditions = {}) {
+        // Compatibility helper to mirror the old InMemoryDB API
+        return await this.find(tableName, conditions);
+    }
+
     async findById(tableName, id) {
         try {
             const query = `SELECT * FROM ${tableName} WHERE id = $1 AND isDeleted = false`;

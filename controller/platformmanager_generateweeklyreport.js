@@ -23,10 +23,32 @@ class GenerateWeeklyReportController {
     }
 
     parseWeekRange(week) {
-        const startDate = new Date(week);
-        const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        return [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]];
+        // Handle ISO week format (e.g., "2024-W01")
+        if (week.includes('-W')) {
+            const [year, weekNum] = week.split('-W');
+            const startDate = this.getDateOfISOWeek(parseInt(year), parseInt(weekNum));
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            return [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]];
+        } else {
+            // Fallback for regular date format
+            const startDate = new Date(week);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            return [startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]];
+        }
+    }
+
+    getDateOfISOWeek(year, week) {
+        const simple = new Date(year, 0, 1 + (week - 1) * 7);
+        const dow = simple.getDay();
+        const ISOweekStart = simple;
+        if (dow <= 4) {
+            ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+        } else {
+            ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+        }
+        return ISOweekStart;
     }
 }
 

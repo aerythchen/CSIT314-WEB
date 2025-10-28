@@ -16,7 +16,7 @@ class Category {
     async createCategory(categoryData) {
         const category = {
             id: `category_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name: categoryData.name,
+            name: categoryData.categoryName,
             description: categoryData.description || '',
             status: 'active',
             requestCount: 0,
@@ -196,6 +196,19 @@ class Category {
         }
 
         return { success: true, data: category };
+    }
+
+    async getCategoryRequestCount(categoryId) {
+        try {
+            const count = await db.count('requests', { 
+                categoryId: categoryId, 
+                isDeleted: false 
+            });
+            return { success: true, count: count };
+        } catch (error) {
+            console.error('Error counting requests for category:', error);
+            return { success: false, error: error.message, count: 0 };
+        }
     }
 }
 
