@@ -76,13 +76,35 @@ app.post('/bce/:boundary/:action', async (req, res) => {
         data.session = req.session;
         
         // Call the appropriate method
-        const methodName = `handle${action.charAt(0).toUpperCase() + action.slice(1)}`;
+        let methodName;
+        if (action.startsWith('handle')) {
+            // Action already starts with 'handle', use as is
+            methodName = action;
+        } else {
+            // Add 'handle' prefix and capitalize first letter
+            methodName = `handle${action.charAt(0).toUpperCase() + action.slice(1)}`;
+        }
+        
+        if (typeof boundaryInstance[methodName] !== 'function') {
+            throw new Error(`Method '${methodName}' not found in boundary '${boundary}'. Available methods: ${Object.getOwnPropertyNames(Object.getPrototypeOf(boundaryInstance)).filter(name => name !== 'constructor')}`);
+        }
+        
         const result = await boundaryInstance[methodName](data);
         
         // Handle login session storage
         if (result.success && boundary.includes('_login') && result.data && result.data.user) {
             req.session.user = result.data.user;
             console.log('✅ Session created for user:', result.data.user.name);
+            
+            // Update last active timestamp in user profile
+            try {
+                await db.update('userProfiles', result.data.user.id, {
+                    updatedat: new Date().toISOString()
+                });
+                console.log('✅ Updated last active timestamp for user:', result.data.user.name);
+            } catch (error) {
+                console.error('⚠️ Failed to update last active timestamp:', error.message);
+            }
             
             // Redirect to appropriate dashboard on successful login
             const userType = result.data.user.userType;
@@ -336,7 +358,7 @@ app.get('/api/all-users', async (req, res) => {
                 email: profile.email,
                 userType: profile.usertype,
                 status: profile.status || 'active',
-                lastActive: profile.updatedat || profile.createdat || null,
+                lastActive: profile.updatedat || null, // Only use updatedat - if null, user has never logged in
                 accountId: account ? account.id : null,
                 username: account ? account.username : null,
                 createdAt: profile.createdat,
@@ -399,7 +421,7 @@ app.get('/api/search-users', async (req, res) => {
                 email: profile.email,
                 userType: profile.usertype,
                 status: profile.status || 'active',
-                lastActive: profile.updatedat || profile.createdat || null,
+                lastActive: profile.updatedat || null, // Only use updatedat - if null, user has never logged in
                 accountId: account ? account.id : null,
                 username: account ? account.username : null
             };

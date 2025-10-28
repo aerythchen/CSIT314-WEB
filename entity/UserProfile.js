@@ -83,7 +83,16 @@ class UserProfile {
             return { success: false, error: "Profile not found" };
         }
 
-        return { success: true, data: profile };
+        // Get user account to include username information
+        const userAccounts = await db.find('userAccounts', {});
+        const account = userAccounts.find(acc => acc.profileid === profileId);
+        
+        const profileWithAccount = {
+            ...profile,
+            username: account ? account.username : null
+        };
+
+        return { success: true, data: profileWithAccount };
     }
 
     // Alias for getUserProfile to match controller expectations
@@ -130,10 +139,24 @@ class UserProfile {
             );
         }
 
+        // Get user accounts to include username information
+        const userAccounts = await db.find('userAccounts', {});
+
+        // Combine profile and account data
+        const usersWithAccounts = profiles.map(profile => {
+            // Find matching account for this profile
+            const account = userAccounts.find(acc => acc.profileid === profile.id);
+            
+            return {
+                ...profile,
+                username: account ? account.username : null
+            };
+        });
+
         return {
             success: true,
-            data: profiles,
-            count: profiles.length
+            data: usersWithAccounts,
+            count: usersWithAccounts.length
         };
     }
 

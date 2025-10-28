@@ -7,11 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/css/dashboard.css" rel="stylesheet">
-    <style>
-        .user-type-badge {
-            font-size: 0.8em;
-        }
-    </style>
+
 </head>
 <body class="dashboard-container">
     <%- include('../partials/header', { title: 'User Admin Dashboard', user: user }) %>
@@ -526,30 +522,39 @@
                 return;
             }
 
-            tbody.innerHTML = users.map(user => `
+            tbody.innerHTML = users.map(user => {
+                // Handle both data formats: search results (firstname/lastname) and API results (name)
+                const fullName = user.name || `${user.firstname || ''} ${user.lastname || ''}`.trim();
+                const firstName = user.firstname || user.name?.split(' ')[0] || '';
+                const userType = user.usertype || user.userType || 'unknown';
+                const status = user.status || 'unknown';
+                // Only use updatedat for lastActive - if null, user has never logged in
+                const lastActive = user.lastActive || user.updatedat || null;
+                
+                return `
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
                             <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">
-                                ${user.name.charAt(0).toUpperCase()}
+                                ${firstName.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                                <div class="fw-bold">${user.name}</div>
+                                <div class="fw-bold">${fullName}</div>
                                 <small class="text-muted">${user.email}</small>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <span class="badge bg-${getUserTypeColor(user.userType)} user-type-badge">
-                            ${getUserTypeLabel(user.userType)}
+                        <span class="badge user-type-badge" style="background-color: ${getUserTypeColor(userType)}; color: white; border: none;">
+                            ${getUserTypeLabel(userType)}
                         </span>
                     </td>
                     <td>
-                        <span class="badge bg-${getStatusColor(user.status)}">
-                            ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                        <span class="badge" style="background-color: ${getStatusColor(status)}; color: ${status === 'pending' ? 'black' : 'white'}; border: none;">
+                            ${status.charAt(0).toUpperCase() + status.slice(1)}
                         </span>
                     </td>
-                    <td>${formatLastActive(user.lastActive)}</td>
+                    <td>${formatLastActive(lastActive)}</td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
                             <button class="btn btn-primary btn-sm" onclick="editUser('${user.id}')" title="Edit">
@@ -564,18 +569,19 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
 
         // Helper functions
         function getUserTypeColor(type) {
             const colors = {
-                'personinneed': 'info',
-                'csrrepresentative': 'success',
-                'platformmanager': 'warning',
-                'useradmin': 'danger'
+                'personinneed': '#4A90E2',        // Soft blue
+                'csrrepresentative': '#6A5ACD',   // Slate blue
+                'platformmanager': '#F5A623',     // Warm orange
+                'useradmin': '#D0021B'            // Deep red
             };
-            return colors[type] || 'secondary';
+            return colors[type] || '#9B9B9B';     // Neutral gray
         }
 
         function getUserTypeLabel(type) {
@@ -590,14 +596,14 @@
 
         function getStatusColor(status) {
             const colors = {
-                'active': 'success',
-                'pending': 'warning'
+                'active': '#28a745',        // Professional green
+                'pending': '#ffc107'        // Warm yellow
             };
-            return colors[status] || 'secondary';
+            return colors[status] || '#6c757d';  // Neutral gray
         }
 
         function formatLastActive(lastActive) {
-            if (!lastActive) return 'Never';
+            if (!lastActive) return '-';
             
             try {
                 const date = new Date(lastActive);
@@ -898,20 +904,26 @@
         }
         
         function displayUserInModal(user) {
+            // Handle both data formats: API results (name, userType, createdAt) and search results (firstname, usertype, createdat)
+            const firstName = user.firstname || user.firstName || user.name?.split(' ')[0] || '-';
+            const lastName = user.lastname || user.lastName || user.name?.split(' ').slice(1).join(' ') || '-';
+            const userType = user.usertype || user.userType || 'unknown';
+            const createdAt = user.createdat || user.createdAt || null;
+            const updatedAt = user.updatedat || user.updatedAt || null;
+            
             // Populate the view modal with user data
-            const nameParts = (user.name || user.firstName + ' ' + (user.lastName || '')).split(' ');
-            document.getElementById('viewFirstName').textContent = nameParts[0] || '-';
-            document.getElementById('viewLastName').textContent = nameParts.slice(1).join(' ') || '-';
+            document.getElementById('viewFirstName').textContent = firstName;
+            document.getElementById('viewLastName').textContent = lastName;
             document.getElementById('viewEmail').textContent = user.email || '-';
             document.getElementById('viewUsername').textContent = user.username || '-';
-            document.getElementById('viewUserType').textContent = getUserTypeLabel(user.userType) || '-';
+            document.getElementById('viewUserType').textContent = getUserTypeLabel(userType);
             
             // Set status
             document.getElementById('viewStatus').textContent = user.status || '-';
             
             // Format dates
-            document.getElementById('viewCreatedAt').textContent = user.createdAt ? new Date(user.createdAt).toLocaleString() : '-';
-            document.getElementById('viewUpdatedAt').textContent = user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-';
+            document.getElementById('viewCreatedAt').textContent = createdAt ? new Date(createdAt).toLocaleString() : '-';
+            document.getElementById('viewUpdatedAt').textContent = updatedAt ? new Date(updatedAt).toLocaleString() : '-';
             
             // Store current user ID for edit functionality
             window.currentViewUserId = user.id || user.profileId;

@@ -5,11 +5,11 @@ class LoginController {
         this.userAccount = new UserAccount();
     }
 
-    login(data) {
+    async login(data) {
         const { email, password, userType } = data;
         
         // Controller only orchestrates - all business logic is in the entity
-        const result = this.userAccount.login(email, password, userType);
+        const result = await this.userAccount.login(email, password, userType);
         return result;
     }
 }

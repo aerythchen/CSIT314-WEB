@@ -9,8 +9,8 @@ class Useradmin_searchuserprofileBoundary {
         try {
             // Format data and call controller - entity already returns proper response format
             const formattedData = {
-                ...data,
-                userType: 'useradmin'
+                ...data
+                // Don't override userType - use what's passed from frontend
             };
             
             return await this.controller.searchUserProfile(formattedData);

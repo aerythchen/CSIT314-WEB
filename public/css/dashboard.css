@@ -5,6 +5,47 @@
 /* ========================================
    GLOBAL VARIABLES
    ======================================== */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Override Bootstrap's default body margin */
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure navbar starts at the very top */
+.navbar {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Override any potential container margins */
+.container-fluid {
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Ensure absolutely no white space at the very top */
+html {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+/* Target the very first element to ensure no gaps */
+body > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
 :root {
     --primary-gradient: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -27,7 +68,8 @@
 .dashboard-container {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     min-height: 100vh;
-    padding: 2rem 0;
+    padding: 0;
+    margin: 0;
 }
 
 .dashboard-header {
@@ -35,6 +77,7 @@
     color: white;
     border-radius: var(--card-radius);
     padding: 2rem;
+    margin-top: 2rem;
     margin-bottom: 2rem;
     box-shadow: var(--shadow-medium);
 }
@@ -417,6 +460,7 @@
 .navbar {
     padding: 1rem 0;
     backdrop-filter: blur(10px);
+    margin-top: 0 !important;
 }
 
 .navbar-brand {
