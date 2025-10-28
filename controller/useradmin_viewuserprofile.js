@@ -5,11 +5,11 @@ class ViewUserProfileController {
         this.entity = new UserProfile();
     }
 
-    viewUserProfile(data) {
+    async viewUserProfile(data) {
         console.log("ViewUserProfileController: Processing view profile request...");
         
-        // Get all profiles using searchProfiles method
-        return this.entity.searchProfiles(null, null, null);
+        // Get specific profile by ID
+        return await this.entity.getUserProfile(data.profileId);
     }
 }
 

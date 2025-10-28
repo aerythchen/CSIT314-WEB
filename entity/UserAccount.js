@@ -137,7 +137,7 @@ class UserAccount {
             lastlogin: null,
             loginattempts: 0,
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null, // New accounts haven't been updated yet
             isdeleted: false
         };
 

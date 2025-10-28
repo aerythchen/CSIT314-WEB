@@ -83,6 +83,15 @@ app.post('/bce/:boundary/:action', async (req, res) => {
         if (result.success && boundary.includes('_login') && result.data && result.data.user) {
             req.session.user = result.data.user;
             console.log('✅ Session created for user:', result.data.user.name);
+            
+            // Redirect to appropriate dashboard on successful login
+            const userType = result.data.user.userType;
+            return res.redirect(`/${userType}/dashboard`);
+        }
+        
+        // Handle login failures - redirect back to login page with error
+        if (boundary.includes('_login') && !result.success) {
+            return res.redirect(`/?error=${encodeURIComponent(result.error || 'Login failed')}`);
         }
         
         // Check if boundary wants to redirect
@@ -115,10 +124,13 @@ app.get('/', (req, res) => {
 
 // Simple logout route (no boundary needed - just destroys session)
 app.get('/auth/logout', (req, res) => {
+    console.log('🔓 Logout requested by user:', req.session.user?.email || 'Unknown');
     req.session.destroy((err) => {
         if (err) {
-            console.error('Error destroying session:', err);
+            console.error('❌ Error destroying session:', err);
+            return res.redirect('/?error=Logout failed');
         }
+        console.log('✅ Session destroyed successfully');
         res.redirect('/?success=Logged out successfully');
     });
 });
@@ -304,8 +316,10 @@ app.get('/api/all-users', async (req, res) => {
             });
         }
         
+        
         // Get all user profiles from database (all users are active since we use hard delete)
         const userProfiles = await db.find('userProfiles', {});
+        
         
         // Get all user accounts from database (all accounts are active since we use hard delete)
         const userAccounts = await db.find('userAccounts', {});
@@ -315,13 +329,14 @@ app.get('/api/all-users', async (req, res) => {
             // Find matching account for this profile
             const account = userAccounts.find(acc => acc.profileid === profile.id);
             
+            
             return {
                 id: profile.id,
                 name: `${profile.firstname} ${profile.lastname}`,
                 email: profile.email,
                 userType: profile.usertype,
                 status: profile.status || 'active',
-                lastActive: profile.updatedat || profile.createdat || new Date().toISOString().split('T')[0],
+                lastActive: profile.updatedat || profile.createdat || null,
                 accountId: account ? account.id : null,
                 username: account ? account.username : null,
                 createdAt: profile.createdat,
@@ -384,7 +399,7 @@ app.get('/api/search-users', async (req, res) => {
                 email: profile.email,
                 userType: profile.usertype,
                 status: profile.status || 'active',
-                lastActive: profile.updatedat || profile.createdat || new Date().toISOString().split('T')[0],
+                lastActive: profile.updatedat || profile.createdat || null,
                 accountId: account ? account.id : null,
                 username: account ? account.username : null
             };

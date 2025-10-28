@@ -5,11 +5,11 @@ class SearchUserProfileController {
         this.entity = new UserProfile();
     }
 
-    searchUserProfile(data) {
+    async searchUserProfile(data) {
         console.log("SearchUserProfileController: Processing search request...");
         
         // Call entity's searchProfiles method
-        return this.entity.searchProfiles(data.searchTerm, data.userType, data.status);
+        return await this.entity.searchProfiles(data.searchTerm, data.userType, data.status);
     }
 }
 

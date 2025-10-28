@@ -82,54 +82,18 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="card text-center border-0 shadow-sm">
-                            <div class="card-body">
-                                <i class="fas fa-user-plus fa-2x text-primary mb-2"></i>
-                                <h6>Create User</h6>
-                                <button class="btn btn-primary btn-sm" onclick="showCreateUserModal()">
-                                    <i class="fas fa-plus"></i> Create
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center border-0 shadow-sm">
-                            <div class="card-body">
-                                <i class="fas fa-search fa-2x text-success mb-2"></i>
-                                <h6>Search Users</h6>
-                                <button class="btn btn-success btn-sm" onclick="showSearchModal()">
-                                    <i class="fas fa-search"></i> Search
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center border-0 shadow-sm">
-                            <div class="card-body">
-                                <i class="fas fa-list fa-2x text-info mb-2"></i>
-                                <h6>View All</h6>
-                                <button class="btn btn-info btn-sm" onclick="loadAllUsers()">
-                                    <i class="fas fa-list"></i> View All
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- Users Table -->
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><i class="fas fa-users"></i> User Management</h5>
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-outline-primary btn-sm" onclick="refreshUsers()">
-                                    <i class="fas fa-sync-alt"></i> Refresh
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary action-btn" onclick="refreshUsers()">
+                                    <i class="fas fa-sync-alt me-2"></i> Refresh
                                 </button>
-                                <button class="btn btn-outline-success btn-sm" onclick="showCreateUserModal()">
-                                    <i class="fas fa-plus"></i> Add User
+                                <button class="btn btn-success action-btn" onclick="showCreateUserModal()">
+                                    <i class="fas fa-user-plus me-2"></i> Create User
                                 </button>
                             </div>
                         </div>
@@ -160,22 +124,27 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <button class="btn btn-primary w-100" onclick="searchUsers()">
-                                    <i class="fas fa-search"></i> Search
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary flex-fill" onclick="searchUsers()">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                    <button class="btn btn-outline-primary flex-fill" onclick="loadAllUsers()">
+                                        <i class="fas fa-list"></i> All
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Users Table -->
                         <div class="table-responsive">
                             <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>Last Active</th>
-                                        <th>Actions</th>
+                                <thead>
+                                    <tr class="table-header-gradient">
+                                        <th class="border-0 text-white fw-semibold py-3">User</th>
+                                        <th class="border-0 text-white fw-semibold py-3">Type</th>
+                                        <th class="border-0 text-white fw-semibold py-3">Status</th>
+                                        <th class="border-0 text-white fw-semibold py-3">Last Active</th>
+                                        <th class="border-0 text-white fw-semibold py-3">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody">
@@ -210,9 +179,9 @@
                 </div>
                 <div class="modal-body">
                     <form id="createUserForm">
+                        <h6><i class="fas fa-user"></i> User Information</h6>
                         <div class="row">
                             <div class="col-md-6">
-                                <h6>Profile Information</h6>
                                 <div class="mb-3">
                                     <label for="firstName" class="form-label">First Name</label>
                                     <input type="text" class="form-control" id="firstName" name="firstName" required>
@@ -220,6 +189,20 @@
                                 <div class="mb-3">
                                     <label for="lastName" class="form-label">Last Name</label>
                                     <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="userType" class="form-label">User Type</label>
@@ -230,21 +213,6 @@
                                         <option value="platformmanager">Platform Manager</option>
                                         <option value="useradmin">User Admin</option>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Account Information</h6>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="username" name="username" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
                                 </div>
                             </div>
                         </div>
@@ -482,6 +450,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadUserStats();
             loadAllUsers();
+            
+            // Add form submission handlers
+            document.getElementById('createUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                createUser();
+            });
         });
 
         // Load user statistics
@@ -513,8 +487,13 @@
         // Load all users
         async function loadAllUsers() {
             try {
-                // Fetch real users from the database
-                const response = await fetch('/api/all-users');
+                // Use existing API endpoint for loading all users
+                const response = await fetch('/api/all-users', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
                 const data = await response.json();
                 
                 if (data.success && data.users) {
@@ -522,7 +501,7 @@
                     displayUsers(data.users);
                 } else {
                     console.error('Failed to load users:', data.error);
-                    showError('Failed to load users from database: ' + (data.error || 'Unknown error'));
+                    showError('Failed to load users: ' + (data.error || 'Unknown error'));
                     displayUsers([]);
                 }
             } catch (error) {
@@ -570,16 +549,16 @@
                             ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                         </span>
                     </td>
-                    <td>${user.lastActive}</td>
+                    <td>${formatLastActive(user.lastActive)}</td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary" onclick="editUser('${user.id}')" title="Edit">
+                            <button class="btn btn-primary btn-sm" onclick="editUser('${user.id}')" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-outline-info" onclick="viewUser('${user.id}')" title="View">
+                            <button class="btn btn-info btn-sm" onclick="viewUser('${user.id}')" title="View">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-danger" onclick="showDeleteModal('${user.id}')" title="Delete">
+                            <button class="btn btn-danger btn-sm" onclick="showDeleteModal('${user.id}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -615,6 +594,39 @@
                 'pending': 'warning'
             };
             return colors[status] || 'secondary';
+        }
+
+        function formatLastActive(lastActive) {
+            if (!lastActive) return 'Never';
+            
+            try {
+                const date = new Date(lastActive);
+                const now = new Date();
+                const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+                const diffInHours = Math.floor(diffInMinutes / 60);
+                const diffInDays = Math.floor(diffInHours / 24);
+                
+                // If it's today, show time
+                if (diffInDays === 0) {
+                    if (diffInMinutes < 1) return 'Just now';
+                    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+                    return `${diffInHours}h ago`;
+                }
+                
+                // If it's within a week, show days
+                if (diffInDays < 7) {
+                    return `${diffInDays}d ago`;
+                }
+                
+                // Otherwise show formatted date
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+            } catch (error) {
+                return 'Unknown';
+            }
         }
 
         // Modal functions
@@ -795,21 +807,28 @@
             const status = document.getElementById('statusFilter').value;
             
             try {
-                // Build search parameters
-                const searchParams = new URLSearchParams();
-                if (searchTerm) searchParams.append('searchTerm', searchTerm);
-                if (userType) searchParams.append('userType', userType);
-                if (status) searchParams.append('status', status);
-                
-                // Fetch filtered users from the database
-                const response = await fetch(`/api/search-users?${searchParams.toString()}`);
+                // Use BCE boundary for search
+                const response = await fetch('/bce/useradmin_searchuserprofile/handleSearchUserProfile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        searchTerm: searchTerm,
+                        userType: userType,
+                        status: status,
+                        userId: '<%= user.id %>' // Current admin user ID
+                    })
+                });
                 const data = await response.json();
                 
-                if (data.success && data.users) {
-                    displayUsers(data.users);
+                if (data.success && data.data) {
+                    displayUsers(data.data);
+                    showSuccess(`Found ${data.data.length} users`);
                 } else {
                     console.error('Search failed:', data.error);
-                    showError('Search failed');
+                    showError('Search failed: ' + (data.error || 'Unknown error'));
                     displayUsers([]);
                 }
             } catch (error) {
@@ -824,16 +843,63 @@
         }
 
         function viewUser(userId) {
-            // Find the user in current users array
-            const user = currentUsers.find(u => u.id === userId);
+            // Show loading state
+            const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+            modal.show();
             
-            if (!user) {
-                showError('User not found');
-                return;
-            }
+            // Show loading in modal
+            document.getElementById('viewFirstName').textContent = 'Loading...';
+            document.getElementById('viewLastName').textContent = '';
+            document.getElementById('viewEmail').textContent = '';
+            document.getElementById('viewUsername').textContent = '';
+            document.getElementById('viewUserType').textContent = '';
+            document.getElementById('viewStatus').textContent = '';
+            document.getElementById('viewCreatedAt').textContent = '';
+            document.getElementById('viewUpdatedAt').textContent = '';
             
+            // Call the boundary to get fresh user data
+            fetch('/bce/useradmin_viewuserprofile/handleViewUserProfile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    profileId: userId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    // Use fresh data from boundary
+                    displayUserInModal(data.data);
+                } else {
+                    // Fallback to current users array if boundary fails
+                    const user = currentUsers.find(u => u.id === userId);
+                    if (user) {
+                        displayUserInModal(user);
+                    } else {
+                        showError('User not found');
+                        modal.hide();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user details:', error);
+                // Fallback to current users array
+                const user = currentUsers.find(u => u.id === userId);
+                if (user) {
+                    displayUserInModal(user);
+                } else {
+                    showError('User not found');
+                    modal.hide();
+                }
+            });
+        }
+        
+        function displayUserInModal(user) {
             // Populate the view modal with user data
-            const nameParts = (user.name || '').split(' ');
+            const nameParts = (user.name || user.firstName + ' ' + (user.lastName || '')).split(' ');
             document.getElementById('viewFirstName').textContent = nameParts[0] || '-';
             document.getElementById('viewLastName').textContent = nameParts.slice(1).join(' ') || '-';
             document.getElementById('viewEmail').textContent = user.email || '-';
@@ -848,11 +914,7 @@
             document.getElementById('viewUpdatedAt').textContent = user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-';
             
             // Store current user ID for edit functionality
-            window.currentViewUserId = userId;
-            
-            // Show the modal
-            const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
-            modal.show();
+            window.currentViewUserId = user.id || user.profileId;
         }
         
         function editUserFromView() {

@@ -23,7 +23,7 @@ const seedData = async (db) => {
             usertype: 'personinneed', 
             status: 'active',
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -41,7 +41,7 @@ const seedData = async (db) => {
             usertype: 'csrrepresentative', 
             status: 'active',
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -59,7 +59,7 @@ const seedData = async (db) => {
             usertype: 'platformmanager', 
             status: 'active',
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -77,7 +77,7 @@ const seedData = async (db) => {
             usertype: 'useradmin', 
             status: 'active',
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -100,7 +100,7 @@ const seedData = async (db) => {
             lastlogin: null,
             loginattempts: 0,
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -118,7 +118,7 @@ const seedData = async (db) => {
             lastlogin: null,
             loginattempts: 0,
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -136,7 +136,7 @@ const seedData = async (db) => {
             lastlogin: null,
             loginattempts: 0,
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         
@@ -154,7 +154,7 @@ const seedData = async (db) => {
             lastlogin: null,
             loginattempts: 0,
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null,
             isdeleted: false
         });
         

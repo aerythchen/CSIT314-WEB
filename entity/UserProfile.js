@@ -14,9 +14,9 @@ class UserProfile {
     // PROFILE AUTHENTICATION
     // ========================================
     
-    authenticateProfile(email, password, userType) {
+    async authenticateProfile(email, password, userType) {
         // Find user profile by email and user type
-        const profile = db.findOne('userProfiles', { 
+        const profile = await db.findOne('userProfiles', { 
             email: email, 
             usertype: userType
         });
@@ -51,7 +51,7 @@ class UserProfile {
             usertype: profileData.userType,
             status: 'active',
             createdat: new Date().toISOString(),
-            updatedat: new Date().toISOString(),
+            updatedat: null, // New users haven't been updated yet
             isdeleted: false
         };
 
@@ -76,14 +76,19 @@ class UserProfile {
         return result;
     }
 
-    getProfile(profileId) {
-        const profile = db.findOne('userProfiles', { id: profileId });
+    async getProfile(profileId) {
+        const profile = await db.findOne('userProfiles', { id: profileId });
         
         if (!profile) {
             return { success: false, error: "Profile not found" };
         }
 
         return { success: true, data: profile };
+    }
+
+    // Alias for getUserProfile to match controller expectations
+    async getUserProfile(profileId) {
+        return await this.getProfile(profileId);
     }
 
     async deleteProfile(profileId) {
@@ -103,8 +108,8 @@ class UserProfile {
     // PROFILE SEARCH
     // ========================================
     
-    searchProfiles(searchTerm, userType, status) {
-        let profiles = db.findAll('userProfiles', {});
+    async searchProfiles(searchTerm, userType, status) {
+        let profiles = await db.find('userProfiles', {});
 
         // Filter by user type
         if (userType && userType !== 'all') {

@@ -5,14 +5,22 @@ class Useradmin_viewuserprofileBoundary {
         this.controller = new useradmin_viewuserprofile();
     }
 
-    handleViewUserProfile(data) {
-        // Format data and call controller - entity already returns proper response format
-        const formattedData = {
-            ...data,
-            userType: 'useradmin'
-        };
-        
-        return this.controller.viewUserProfile(formattedData);
+    async handleViewUserProfile(data) {
+        try {
+            // Format data and call controller - entity already returns proper response format
+            const formattedData = {
+                ...data,
+                userType: 'useradmin'
+            };
+            
+            return await this.controller.viewUserProfile(formattedData);
+        } catch (error) {
+            console.error('Error in handleViewUserProfile boundary:', error);
+            return {
+                success: false,
+                error: 'Failed to view user profile: ' + error.message
+            };
+        }
     }
 }
 

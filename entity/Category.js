@@ -13,7 +13,7 @@ class Category {
     // CATEGORY CREATION
     // ========================================
     
-    createCategory(categoryData) {
+    async createCategory(categoryData) {
         const category = {
             id: `category_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             name: categoryData.name,
@@ -25,7 +25,7 @@ class Category {
             isDeleted: false
         };
 
-        const result = db.insert('categories', category);
+        const result = await db.insert('categories', category);
         return result;
     }
 
@@ -33,8 +33,8 @@ class Category {
     // CATEGORY MANAGEMENT
     // ========================================
     
-    updateCategory(categoryId, updateData) {
-        const category = db.findOne('categories', { id: categoryId, isDeleted: false });
+    async updateCategory(categoryId, updateData) {
+        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
@@ -46,12 +46,12 @@ class Category {
             updatedAt: new Date().toISOString()
         };
 
-        const result = db.update('categories', categoryId, updatedCategory);
+        const result = await db.update('categories', categoryId, updatedCategory);
         return result;
     }
 
-    getCategory(categoryId) {
-        const category = db.findOne('categories', { id: categoryId, isDeleted: false });
+    async getCategory(categoryId) {
+        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
@@ -60,14 +60,14 @@ class Category {
         return { success: true, data: category };
     }
 
-    deleteCategory(categoryId) {
-        const category = db.findOne('categories', { id: categoryId, isDeleted: false });
+    async deleteCategory(categoryId) {
+        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
         }
 
-        const result = db.update('categories', categoryId, {
+        const result = await db.update('categories', categoryId, {
             isDeleted: true,
             updatedAt: new Date().toISOString()
         });
@@ -79,8 +79,8 @@ class Category {
     // CATEGORY SEARCH
     // ========================================
     
-    searchCategories(searchTerm, status) {
-        let categories = db.findAll('categories', { isDeleted: false });
+    async searchCategories(searchTerm, status) {
+        let categories = await db.find('categories', { isDeleted: false });
 
         // Filter by status
         if (status && status !== 'all') {
@@ -102,8 +102,8 @@ class Category {
         };
     }
 
-    getAllCategories() {
-        const categories = db.findAll('categories', { isDeleted: false });
+    async getAllCategories() {
+        const categories = await db.find('categories', { isDeleted: false });
 
         return {
             success: true,
@@ -114,11 +114,11 @@ class Category {
 
     // Alias for viewCategory to match controller expectations
     async viewCategory(data) {
-        return this.getAllCategories();
+        return await this.getAllCategories();
     }
 
-    getActiveCategories() {
-        const categories = db.findAll('categories', { 
+    async getActiveCategories() {
+        const categories = await db.find('categories', { 
             status: 'active', 
             isDeleted: false 
         });
@@ -134,46 +134,46 @@ class Category {
     // CATEGORY STATUS MANAGEMENT
     // ========================================
     
-    activateCategory(categoryId) {
-        return this.updateCategory(categoryId, { status: 'active' });
+    async activateCategory(categoryId) {
+        return await this.updateCategory(categoryId, { status: 'active' });
     }
 
-    deactivateCategory(categoryId) {
-        return this.updateCategory(categoryId, { status: 'inactive' });
+    async deactivateCategory(categoryId) {
+        return await this.updateCategory(categoryId, { status: 'inactive' });
     }
 
     // ========================================
     // CATEGORY REQUEST COUNTING
     // ========================================
     
-    incrementRequestCount(categoryId) {
-        const category = db.findOne('categories', { id: categoryId, isDeleted: false });
+    async incrementRequestCount(categoryId) {
+        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
         }
 
         const newRequestCount = (category.requestCount || 0) + 1;
-        return this.updateCategory(categoryId, { requestCount: newRequestCount });
+        return await this.updateCategory(categoryId, { requestCount: newRequestCount });
     }
 
-    decrementRequestCount(categoryId) {
-        const category = db.findOne('categories', { id: categoryId, isDeleted: false });
+    async decrementRequestCount(categoryId) {
+        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
         }
 
         const newRequestCount = Math.max((category.requestCount || 0) - 1, 0);
-        return this.updateCategory(categoryId, { requestCount: newRequestCount });
+        return await this.updateCategory(categoryId, { requestCount: newRequestCount });
     }
 
     // ========================================
     // CATEGORY VALIDATION
     // ========================================
     
-    validateCategoryName(name, excludeId = null) {
-        const existingCategory = db.findOne('categories', { 
+    async validateCategoryName(name, excludeId = null) {
+        const existingCategory = await db.findOne('categories', { 
             name: name, 
             isDeleted: false 
         });
