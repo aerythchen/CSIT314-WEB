@@ -11,62 +11,38 @@ async function addTrackingColumns() {
     try {
         console.log('🔄 Starting migration: Add tracking columns to requests table...');
         
-        // Check if columns already exist
-        let existingColumns = [];
-        try {
-            const checkColumns = await db.executeQuery(`
-                SELECT column_name 
-                FROM information_schema.columns 
-                WHERE table_name = 'requests' 
-                AND column_name IN ('viewcount', 'shortlistcount')
-            `);
-            existingColumns = checkColumns.rows ? checkColumns.rows.map(row => row.column_name) : [];
-        } catch (error) {
-            // If query fails, assume columns don't exist
-            console.log('🔍 Checking existing columns...');
-        }
-        
-        if (existingColumns.includes('viewcount') && existingColumns.includes('shortlistcount')) {
-            console.log('✅ Tracking columns already exist - skipping migration');
-            return;
-        }
+        // Try to add columns - if they already exist, the error will be caught and handled
         
         // Add viewcount column if it doesn't exist
-        if (!existingColumns.includes('viewcount')) {
-            try {
-                console.log('➕ Adding viewcount column...');
-                await db.executeQuery(`
-                    ALTER TABLE requests 
-                    ADD COLUMN viewcount INTEGER DEFAULT 0
-                `);
-                console.log('✅ viewcount column added');
-            } catch (error) {
-                if (error.code === '42701') { // Column already exists
-                    console.log('✅ viewcount column already exists');
-                } else {
-                    console.error('❌ Error adding viewcount column:', error.message);
-                    throw error;
-                }
-            }
+        console.log('➕ Adding viewcount column...');
+        const viewcountResult = await db.executeQuery(`
+            ALTER TABLE requests 
+            ADD COLUMN viewcount INTEGER DEFAULT 0
+        `);
+        
+        if (viewcountResult.success) {
+            console.log('✅ viewcount column added');
+        } else if (viewcountResult.error && viewcountResult.error.includes('already exists')) {
+            console.log('✅ viewcount column already exists - skipping');
+        } else {
+            console.error('❌ Error adding viewcount column:', viewcountResult.error);
+            throw new Error(viewcountResult.error);
         }
         
         // Add shortlistcount column if it doesn't exist
-        if (!existingColumns.includes('shortlistcount')) {
-            try {
-                console.log('➕ Adding shortlistcount column...');
-                await db.executeQuery(`
-                    ALTER TABLE requests 
-                    ADD COLUMN shortlistcount INTEGER DEFAULT 0
-                `);
-                console.log('✅ shortlistcount column added');
-            } catch (error) {
-                if (error.code === '42701') { // Column already exists
-                    console.log('✅ shortlistcount column already exists');
-                } else {
-                    console.error('❌ Error adding shortlistcount column:', error.message);
-                    throw error;
-                }
-            }
+        console.log('➕ Adding shortlistcount column...');
+        const shortlistcountResult = await db.executeQuery(`
+            ALTER TABLE requests 
+            ADD COLUMN shortlistcount INTEGER DEFAULT 0
+        `);
+        
+        if (shortlistcountResult.success) {
+            console.log('✅ shortlistcount column added');
+        } else if (shortlistcountResult.error && shortlistcountResult.error.includes('already exists')) {
+            console.log('✅ shortlistcount column already exists - skipping');
+        } else {
+            console.error('❌ Error adding shortlistcount column:', shortlistcountResult.error);
+            throw new Error(shortlistcountResult.error);
         }
         
         // Update existing records to have default values

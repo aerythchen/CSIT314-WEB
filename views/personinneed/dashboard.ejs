@@ -116,9 +116,6 @@
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-search"></i> Search
                                         </button>
-                                        <button type="button" class="btn btn-secondary" onclick="clearSearchForm()">
-                                            <i class="fas fa-times"></i> Clear
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -138,9 +135,6 @@
                             <button onclick="scrollToSearchForm()" class="btn btn-outline-primary me-2">
                                 <i class="fas fa-arrow-up"></i> Back to Search
                             </button>
-                            <a href="/personinneed/dashboard" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Clear Search
-                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -240,9 +234,6 @@
                 <div class="card mb-4" id="completed-matches-section">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5><i class="fas fa-check-circle text-success"></i> Completed Matches</h5>
-                        <button onclick="hideCompletedMatches()" class="btn btn-sm btn-secondary">
-                            <i class="fas fa-times"></i> Close
-                        </button>
                     </div>
                     <div class="card-body">
                         <!-- Search Form for Completed Matches -->
@@ -256,11 +247,11 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="completed-dateFrom" class="form-label">Date From</label>
+                                    <label for="completed-dateFrom" class="form-label">Completed Date From</label>
                                     <input type="date" class="form-control" id="completed-dateFrom" name="dateFrom">
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="completed-dateTo" class="form-label">Date To</label>
+                                    <label for="completed-dateTo" class="form-label">Completed Date To</label>
                                     <input type="date" class="form-control" id="completed-dateTo" name="dateTo">
                                 </div>
                                 <div class="col-md-2">
@@ -268,9 +259,6 @@
                                     <div>
                                         <button type="button" class="btn btn-primary me-2" onclick="searchCompletedMatches()">
                                             <i class="fas fa-search"></i> Search
-                                        </button>
-                                        <button type="button" class="btn btn-secondary" onclick="clearCompletedSearch()">
-                                            <i class="fas fa-times"></i> Clear
                                         </button>
                                     </div>
                                 </div>
@@ -316,8 +304,10 @@
         // Load categories dynamically
         async function loadCategories() {
             try {
+                console.log('Loading categories...');
                 const response = await fetch('/api/categories');
                 const data = await response.json();
+                console.log('Categories API response:', data);
                 
                 if (data.success && data.data && data.data.categories) {
                     // Populate search category dropdown
@@ -337,23 +327,30 @@
                     
                     // Populate create modal category dropdown
                     const createCategorySelect = document.getElementById('createCategory');
+                    console.log('Create category select element:', createCategorySelect);
                     if (createCategorySelect) {
                         const defaultOption = createCategorySelect.querySelector('option[value=""]');
                         createCategorySelect.innerHTML = '';
                         createCategorySelect.appendChild(defaultOption);
                         
-                        data.categories.forEach(category => {
+                        console.log('Populating create modal with categories:', data.data.categories);
+                        data.data.categories.forEach(category => {
                             const option = document.createElement('option');
                             option.value = category.name;
                             option.textContent = category.name;
                             createCategorySelect.appendChild(option);
                         });
+                        console.log('Create modal category dropdown populated');
+                    } else {
+                        console.error('Create category select element not found!');
                     }
                 } else {
                     console.error('Failed to load categories:', data.error);
+                    showError('Failed to load categories: ' + (data.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error loading categories:', error);
+                showError('Error loading categories: ' + error.message);
             }
         }
         
@@ -459,14 +456,6 @@
             }
         }
         
-        // Clear search form
-        function clearSearchForm() {
-            document.getElementById('category').value = '';
-            document.getElementById('status').value = '';
-            document.getElementById('urgency').value = '';
-            document.getElementById('dateFrom').value = '';
-            document.getElementById('dateTo').value = '';
-        }
         
         // Scroll to completed matches section
         function scrollToCompletedMatches() {
@@ -480,17 +469,7 @@
             section.scrollIntoView({ behavior: 'smooth' });
         }
         
-        // Hide completed matches section
-        function hideCompletedMatches() {
-            document.getElementById('completed-matches-section').style.display = 'none';
-        }
         
-        // Clear completed matches search form
-        function clearCompletedSearch() {
-            document.getElementById('completed-category').value = '';
-            document.getElementById('completed-dateFrom').value = '';
-            document.getElementById('completed-dateTo').value = '';
-        }
         
         // Load completed matches
         async function loadCompletedMatches() {

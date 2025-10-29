@@ -88,6 +88,41 @@
                                     </div>
                                 </div>
 
+                                <!-- Search Categories Section -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5><i class="fas fa-search me-2"></i>Search Categories</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <form id="searchCategoriesForm">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <input type="text" class="form-control" id="categorySearchTerm" placeholder="Search by name or description...">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" class="btn btn-primary w-100" onclick="searchCategories()">
+                                                                <i class="fas fa-search me-2"></i>Search
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" class="btn btn-secondary w-100" onclick="clearCategorySearch()">
+                                                                <i class="fas fa-times me-2"></i>Clear
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" class="btn btn-outline-primary w-100" onclick="viewAllCategories()">
+                                                                <i class="fas fa-list me-2"></i>View All
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Categories List -->
                                 <div id="categoriesList" class="mt-4">
                                     <h5><i class="fas fa-list me-2"></i>Categories</h5>
@@ -489,10 +524,11 @@
         }
 
         // Display categories
-        async function displayCategories() {
+        async function displayCategories(data = null) {
             const container = document.getElementById('categoriesContent');
+            const categoriesToDisplay = data || categoriesData;
             
-            if (categoriesData.length === 0) {
+            if (categoriesToDisplay.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-4">
                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
@@ -504,7 +540,7 @@
 
             // Get real-time request counts for each category
             const categoriesWithCounts = await Promise.all(
-                categoriesData.map(async (category) => {
+                categoriesToDisplay.map(async (category) => {
                     const result = await makeRequest('/bce/platformmanager_viewcategory/getCategoryRequestCount', {
                         categoryId: category.id
                     });
@@ -655,6 +691,41 @@
         async function viewAllCategories() {
             await loadCategories();
             showToast('Categories refreshed!', 'success');
+        }
+
+        // Generic API Call Function
+        async function apiCall(endpoint, data) {
+            const formData = new FormData();
+            Object.keys(data).forEach(key => formData.append(key, data[key]));
+            
+            const response = await fetch(`/bce/${endpoint}`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            return await response.json();
+        }
+
+        // Search categories
+        async function searchCategories() {
+            const searchTerm = document.getElementById('categorySearchTerm').value;
+            
+            const response = await apiCall('platformmanager_searchcategory/handleSearchCategory', {
+                searchTerm: searchTerm
+            });
+            
+            if (response.success) {
+                displayCategories(response.data);
+                showToast(`Found ${response.count} categories`, 'success');
+            } else {
+                showToast('Search failed: ' + response.error, 'error');
+            }
+        }
+
+        // Clear category search
+        function clearCategorySearch() {
+            document.getElementById('categorySearchTerm').value = '';
+            loadCategories();
         }
 
         // Search reports - removed

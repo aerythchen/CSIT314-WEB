@@ -126,11 +126,11 @@ class Request {
     // ========================================
     
     approveRequest(requestId) {
-        return this.updateRequest(requestId, { status: 'approved' });
+        return this.updateRequest(requestId, { status: 'assigned' });
     }
 
     rejectRequest(requestId) {
-        return this.updateRequest(requestId, { status: 'rejected' });
+        return this.updateRequest(requestId, { status: 'pending' });
     }
 
     completeRequest(requestId) {
@@ -158,13 +158,14 @@ class Request {
 
 	async searchOpportunities(searchTerm, category, urgency) {
 		try {
-			// Get all requests that are not deleted
+			// Get all requests that are not deleted and still pending (available for assignment)
 			let query = `
 				SELECT r.*, up.firstName || ' ' || up.lastName as createdByName, c.name as categoryName
 				FROM requests r
 				JOIN userProfiles up ON r.createdBy = up.id
 				JOIN categories c ON r.categoryId = c.id
 				WHERE r.isDeleted = false
+				AND r.status = 'pending'
 			`;
 			
 			const queryParams = [];
@@ -334,10 +335,10 @@ class Request {
 
 	async _incrementViewCountAsync(request) {
 		try {
-			const newCount = (request.viewCount || 0) + 1;
+			const newCount = (request.viewcount || 0) + 1;
 			const updated = await this.db.update('requests', request.id, {
-				viewCount: newCount,
-				updatedAt: new Date().toISOString()
+				viewcount: newCount,
+				updatedat: new Date().toISOString()
 			});
 			return updated.success ? updated.data : null;
 		} catch (error) {
@@ -350,10 +351,10 @@ class Request {
 		try {
 			const req = await this.db.findById('requests', requestId);
 			if (!req) return;
-			const next = Math.max(0, (req.shortlistCount || 0) + delta);
+			const next = Math.max(0, (req.shortlistcount || 0) + delta);
 			await this.db.update('requests', requestId, {
-				shortlistCount: next,
-				updatedAt: new Date().toISOString()
+				shortlistcount: next,
+				updatedat: new Date().toISOString()
 			});
 		} catch (error) {
 			console.error('Request._incrementShortlistCountAsync error:', error);
@@ -569,10 +570,10 @@ class Request {
             });
 
             if (request) {
-                const newCount = Math.max(0, (request.shortlistCount || 0) + increment);
+                const newCount = Math.max(0, (request.shortlistcount || 0) + increment);
                 await db.update('requests', requestId, {
-                    shortlistCount: newCount,
-                    updatedAt: new Date().toISOString()
+                    shortlistcount: newCount,
+                    updatedat: new Date().toISOString()
                 });
             }
         } catch (error) {
@@ -679,6 +680,7 @@ class Request {
     async searchUserShortlist(userId, searchTerm = '', category = '', urgency = '') {
         try {
             console.log(`Searching shortlist for user: ${userId}, term: "${searchTerm}", category: "${category}", urgency: "${urgency}"`);
+            console.log(`Urgency filter value: "${urgency}", type: ${typeof urgency}, length: ${urgency ? urgency.length : 'null'}`);
             
             let query = `
                 SELECT 
@@ -727,6 +729,9 @@ class Request {
                 paramCount++;
                 query += ` AND r.urgency = $${paramCount}`;
                 params.push(urgency.trim());
+                console.log(`Added urgency filter: "${urgency.trim()}" to query`);
+            } else {
+                console.log(`No urgency filter applied - urgency: "${urgency}"`);
             }
             
             // Exclude requests that have already been accepted (have matches)
@@ -740,22 +745,43 @@ class Request {
             
             const result = await this.db.pool.query(query, params);
             
-            // Normalize field names to camelCase
-            const shortlistItems = result.rows.map(row => ({
-                shortlistId: row.shortlistid,
-                shortlistCreatedAt: row.shortlistcreatedat,
-                id: row.id,
-                title: row.title,
-                description: row.description,
-                urgency: row.urgency,
-                status: row.status,
-                viewCount: row.viewcount,
-                shortlistCount: row.shortlistcount,
-                createdAt: row.createdat,
-                createdBy: row.createdby,
-                createdByName: row.createdbyname,
-                categoryName: row.categoryname
-            }));
+            // Normalize field names to camelCase and add status badge
+            const shortlistItems = result.rows.map(row => {
+                const status = row.status;
+                let statusBadge = 'bg-secondary';
+                
+                // Set status badge color based on status
+                switch (status) {
+                    case 'pending':
+                        statusBadge = 'bg-warning';
+                        break;
+                    case 'assigned':
+                        statusBadge = 'bg-info';
+                        break;
+                    case 'completed':
+                        statusBadge = 'bg-success';
+                        break;
+                    default:
+                        statusBadge = 'bg-secondary';
+                }
+                
+                return {
+                    shortlistId: row.shortlistid,
+                    shortlistCreatedAt: row.shortlistcreatedat,
+                    id: row.id,
+                    title: row.title,
+                    description: row.description,
+                    urgency: row.urgency,
+                    status: status,
+                    statusBadge: statusBadge,
+                    viewCount: row.viewcount,
+                    shortlistCount: row.shortlistcount,
+                    createdAt: row.createdat,
+                    createdBy: row.createdby,
+                    createdByName: row.createdbyname,
+                    categoryName: row.categoryname
+                };
+            });
             
             console.log(`Found ${shortlistItems.length} matching items in shortlist for user ${userId}`);
             
@@ -788,52 +814,80 @@ class Request {
             const query = `
                 SELECT 
                     m.id as matchId,
-                    m.serviceType,
-                    m.completedAt,
+                    m.servicetype as serviceType,
+                    m.status as matchStatus,
+                    m.completedat as completedAt,
                     m.notes,
-                    m.createdAt as matchCreatedAt,
+                    m.createdat as matchCreatedAt,
                     r.id as requestId,
                     r.title,
                     r.description,
                     r.urgency,
                     r.status as requestStatus,
-                    r.viewCount,
-                    r.shortlistCount,
-                    r.createdAt as requestCreatedAt,
-                    r.createdBy,
-                    up.firstName || ' ' || up.lastName as createdByName,
+                    r.viewcount as viewCount,
+                    r.shortlistcount as shortlistCount,
+                    r.createdat as requestCreatedAt,
+                    r.createdby as createdBy,
+                    up.firstname || ' ' || up.lastname as createdByName,
                     c.name as categoryName
                 FROM matches m
-                JOIN requests r ON m.requestId = r.id
-                JOIN userProfiles up ON r.createdBy = up.id
-                JOIN categories c ON r.categoryId = c.id
-                WHERE m.csrId = $1 
-                AND m.isDeleted = false
-                AND r.isDeleted = false
-                ORDER BY m.createdAt DESC
+                JOIN requests r ON m.requestid = r.id
+                JOIN userprofiles up ON r.createdby = up.id
+                JOIN categories c ON r.categoryid = c.id
+                WHERE m.csrid = $1 
+                AND m.isdeleted = false
+                AND r.isdeleted = false
+                ORDER BY m.createdat DESC
             `;
             
             const result = await this.db.pool.query(query, [userId]);
             
-            // Normalize field names to camelCase
-            const historyItems = result.rows.map(row => ({
-                matchId: row.matchid,
-                serviceType: row.servicetype,
-                completedAt: row.completedat,
-                notes: row.notes,
-                matchCreatedAt: row.matchcreatedat,
-                requestId: row.requestid,
-                title: row.title,
-                description: row.description,
-                urgency: row.urgency,
-                requestStatus: row.requeststatus,
-                viewCount: row.viewcount,
-                shortlistCount: row.shortlistcount,
-                requestCreatedAt: row.requestcreatedat,
-                createdBy: row.createdby,
-                createdByName: row.createdbyname,
-                categoryName: row.categoryname
-            }));
+            // Normalize field names to camelCase and add status badge
+            const historyItems = result.rows.map(row => {
+                const matchStatus = row.matchstatus;
+                let statusBadge = 'bg-secondary';
+                let displayStatus = matchStatus;
+                
+                // Set status badge color and display text based on match status
+                switch (matchStatus) {
+                    case 'pending':
+                        statusBadge = 'bg-info';
+                        displayStatus = 'assigned';
+                        break;
+                    case 'completed':
+                        statusBadge = 'bg-success';
+                        displayStatus = 'completed';
+                        break;
+                    case 'cancelled':
+                        statusBadge = 'bg-danger';
+                        displayStatus = 'cancelled';
+                        break;
+                    default:
+                        statusBadge = 'bg-secondary';
+                        displayStatus = matchStatus;
+                }
+                
+                return {
+                    matchId: row.matchid,
+                    serviceType: row.servicetype,
+                    status: displayStatus,
+                    statusBadge: statusBadge,
+                    completedAt: row.completedat,
+                    notes: row.notes,
+                    matchCreatedAt: row.matchcreatedat,
+                    requestId: row.requestid,
+                    title: row.title,
+                    description: row.description,
+                    urgency: row.urgency,
+                    requestStatus: row.requeststatus,
+                    viewCount: row.viewcount,
+                    shortlistCount: row.shortlistcount,
+                    requestCreatedAt: row.requestcreatedat,
+                    createdBy: row.createdby,
+                    createdByName: row.createdbyname,
+                    categoryName: row.categoryname
+                };
+            });
             
             console.log(`Found ${historyItems.length} history items for user ${userId}`);
             
@@ -859,28 +913,29 @@ class Request {
             let query = `
                 SELECT 
                     m.id as matchId,
-                    m.serviceType,
-                    m.completedAt,
+                    m.servicetype as serviceType,
+                    m.status as matchStatus,
+                    m.completedat as completedAt,
                     m.notes,
-                    m.createdAt as matchCreatedAt,
+                    m.createdat as matchCreatedAt,
                     r.id as requestId,
                     r.title,
                     r.description,
                     r.urgency,
                     r.status as requestStatus,
-                    r.viewCount,
-                    r.shortlistCount,
-                    r.createdAt as requestCreatedAt,
-                    r.createdBy,
-                    up.firstName || ' ' || up.lastName as createdByName,
+                    r.viewcount as viewCount,
+                    r.shortlistcount as shortlistCount,
+                    r.createdat as requestCreatedAt,
+                    r.createdby as createdBy,
+                    up.firstname || ' ' || up.lastname as createdByName,
                     c.name as categoryName
                 FROM matches m
-                JOIN requests r ON m.requestId = r.id
-                JOIN userProfiles up ON r.createdBy = up.id
-                JOIN categories c ON r.categoryId = c.id
-                WHERE m.csrId = $1 
-                AND m.isDeleted = false
-                AND r.isDeleted = false
+                JOIN requests r ON m.requestid = r.id
+                JOIN userprofiles up ON r.createdby = up.id
+                JOIN categories c ON r.categoryid = c.id
+                WHERE m.csrid = $1 
+                AND m.isdeleted = false
+                AND r.isdeleted = false
             `;
             
             const params = [userId];
@@ -907,36 +962,65 @@ class Request {
                 params.push(urgency.trim());
             }
             
-            // Add status filter (using request status, not match status)
+            // Add status filter (using match status)
             if (status && status.trim()) {
                 paramCount++;
-                query += ` AND r.status = $${paramCount}`;
-                params.push(status.trim());
+                // Map "assigned" to "pending" for match status
+                const matchStatus = status.trim() === 'assigned' ? 'pending' : status.trim();
+                query += ` AND m.status = $${paramCount}`;
+                params.push(matchStatus);
             }
             
-            query += ` ORDER BY m.createdAt DESC`;
+            query += ` ORDER BY m.createdat DESC`;
             
             const result = await this.db.pool.query(query, params);
             
-            // Normalize field names to camelCase
-            const historyItems = result.rows.map(row => ({
-                matchId: row.matchid,
-                serviceType: row.servicetype,
-                completedAt: row.completedat,
-                notes: row.notes,
-                matchCreatedAt: row.matchcreatedat,
-                requestId: row.requestid,
-                title: row.title,
-                description: row.description,
-                urgency: row.urgency,
-                requestStatus: row.requeststatus,
-                viewCount: row.viewcount,
-                shortlistCount: row.shortlistcount,
-                requestCreatedAt: row.requestcreatedat,
-                createdBy: row.createdby,
-                createdByName: row.createdbyname,
-                categoryName: row.categoryname
-            }));
+            // Normalize field names to camelCase and add status badge
+            const historyItems = result.rows.map(row => {
+                const matchStatus = row.matchstatus;
+                let statusBadge = 'bg-secondary';
+                let displayStatus = matchStatus;
+                
+                // Set status badge color and display text based on match status
+                switch (matchStatus) {
+                    case 'pending':
+                        statusBadge = 'bg-info';
+                        displayStatus = 'assigned';
+                        break;
+                    case 'completed':
+                        statusBadge = 'bg-success';
+                        displayStatus = 'completed';
+                        break;
+                    case 'cancelled':
+                        statusBadge = 'bg-danger';
+                        displayStatus = 'cancelled';
+                        break;
+                    default:
+                        statusBadge = 'bg-secondary';
+                        displayStatus = matchStatus;
+                }
+                
+                return {
+                    matchId: row.matchid,
+                    serviceType: row.servicetype,
+                    status: displayStatus,
+                    statusBadge: statusBadge,
+                    completedAt: row.completedat,
+                    notes: row.notes,
+                    matchCreatedAt: row.matchcreatedat,
+                    requestId: row.requestid,
+                    title: row.title,
+                    description: row.description,
+                    urgency: row.urgency,
+                    requestStatus: row.requeststatus,
+                    viewCount: row.viewcount,
+                    shortlistCount: row.shortlistcount,
+                    requestCreatedAt: row.requestcreatedat,
+                    createdBy: row.createdby,
+                    createdByName: row.createdbyname,
+                    categoryName: row.categoryname
+                };
+            });
             
             console.log(`Found ${historyItems.length} matching history items for user ${userId}`);
             
@@ -1003,7 +1087,7 @@ class Request {
                 notes: ''
             };
             
-            const matchResult = this.matchEntity.createMatch(matchData);
+            const matchResult = await this.matchEntity.createMatch(matchData);
             
             if (!matchResult.success) {
                 return { success: false, error: matchResult.error };
@@ -1029,7 +1113,7 @@ class Request {
                     status: 'assigned',
                     createdAt: matchResult.data.createdAt
                 },
-                message: `Request accepted and assigned successfully. Match created with ID: ${matchResult.data.id}`
+                message: `Request accepted and assigned successfully.`
             };
             
         } catch (error) {
@@ -1073,9 +1157,7 @@ class Request {
             }
             
             // Update match with completion details using Match entity
-            const completedAt = new Date().toISOString();
-            
-            const updateResult = this.matchEntity.completeMatch(matchId, notes);
+            const updateResult = await this.matchEntity.completeMatch(matchId, notes);
             
             if (!updateResult.success) {
                 return { success: false, error: updateResult.error };
@@ -1088,7 +1170,7 @@ class Request {
                 UPDATE requests 
                 SET status = 'completed', updatedat = $1
                 WHERE id = $2
-            `, [updatedAt, match.requestid]);
+            `, [new Date().toISOString(), match.requestid]);
             
             console.log(`✅ Request status updated to completed: ${match.requestid}`);
             
@@ -1098,7 +1180,7 @@ class Request {
                     matchId: matchId,
                     requestId: match.requestid,
                     status: 'completed',
-                    completedAt: updateResult.data.completedAt,
+                    completedAt: updateResult.data.completedat,
                     notes: notes
                 },
                 message: `Match and request completed successfully. Request: ${match.title}`
@@ -1297,24 +1379,30 @@ class Request {
                 query.status = filters.status;
             }
             
-            // Add date range filter if provided
-            // For completed matches, date range should apply to completion date (updatedat)
-            if (filters.dateRange && (filters.dateRange.from || filters.dateRange.to)) {
-                const dateQuery = {};
-                if (filters.dateRange.from) {
-                    dateQuery.$gte = new Date(filters.dateRange.from);
-                }
-                if (filters.dateRange.to) {
-                    const toDate = new Date(filters.dateRange.to);
-                    toDate.setHours(23, 59, 59, 999); // End of day
-                    dateQuery.$lte = toDate;
-                }
-                query.updatedat = dateQuery;
-            }
-            
+            // Get all completed requests first
             const requests = await this.db.find('requests', query);
             
-            if (!requests || requests.length === 0) {
+            // Apply date range filter on completion date (updatedat) - client-side filtering
+            let filteredRequests = requests;
+            if (filters.dateRange && (filters.dateRange.from || filters.dateRange.to)) {
+                const fromDate = filters.dateRange.from ? new Date(filters.dateRange.from) : null;
+                const toDate = filters.dateRange.to ? new Date(filters.dateRange.to) : null;
+                
+                filteredRequests = requests.filter(request => {
+                    const completionDate = new Date(request.updatedat);
+                    
+                    if (fromDate && toDate) {
+                        return completionDate >= fromDate && completionDate <= toDate;
+                    } else if (fromDate) {
+                        return completionDate >= fromDate;
+                    } else if (toDate) {
+                        return completionDate <= toDate;
+                    }
+                    return true;
+                });
+            }
+            
+            if (!filteredRequests || filteredRequests.length === 0) {
                 return {
                     success: true,
                     data: {
@@ -1325,12 +1413,12 @@ class Request {
             }
             
             // Sort by completion date (newest first)
-            requests.sort((a, b) => new Date(b.updatedat) - new Date(a.updatedat));
+            filteredRequests.sort((a, b) => new Date(b.updatedat) - new Date(a.updatedat));
             
             return {
                 success: true,
                 data: {
-                    requests: requests,
+                    requests: filteredRequests,
                     count: requests.length
                 }
             };
@@ -1423,13 +1511,14 @@ class Request {
                 return { success: false, error: "Request not found" };
             }
             
+            
             // Increment view count
             const currentViewCount = request.viewcount || 0;
             const newViewCount = currentViewCount + 1;
             
             // Update the view count in the database
             await this.db.update('requests', 
-                { id: requestId }, 
+                requestId, 
                 { viewcount: newViewCount }
             );
             
@@ -1466,13 +1555,14 @@ class Request {
                 return { success: false, error: "Request not found" };
             }
             
+            
             // Increment shortlist count
             const currentShortlistCount = request.shortlistcount || 0;
             const newShortlistCount = currentShortlistCount + 1;
             
             // Update the shortlist count in the database
             await this.db.update('requests', 
-                { id: requestId }, 
+                requestId, 
                 { shortlistcount: newShortlistCount }
             );
             
@@ -1499,14 +1589,12 @@ class Request {
     // GET VIEW COUNT
     // ========================================
     
-    getViewCount(requestId) {
+    async getViewCount(requestId) {
         try {
-            const request = db.findOne('requests', { id: requestId, isDeleted: false });
-            
+            const request = await this.db.findOne('requests', { id: requestId });
             if (!request) {
                 return { success: false, error: "Request not found" };
             }
-
             return {
                 success: true,
                 data: {
@@ -1523,14 +1611,12 @@ class Request {
     // GET SHORTLIST COUNT
     // ========================================
     
-    getShortlistCount(requestId) {
+    async getShortlistCount(requestId) {
         try {
-            const request = db.findOne('requests', { id: requestId, isDeleted: false });
-            
+            const request = await this.db.findOne('requests', { id: requestId });
             if (!request) {
                 return { success: false, error: "Request not found" };
             }
-
             return {
                 success: true,
                 data: {

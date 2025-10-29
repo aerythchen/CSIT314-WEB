@@ -38,7 +38,7 @@ const models = {
         title: { type: 'string', required: true, minLength: 5 },
         description: { type: 'string', required: true, minLength: 10 },
         urgency: { type: 'enum', enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
-        status: { type: 'enum', enum: ['pending', 'approved', 'rejected', 'completed'], default: 'pending' },
+        status: { type: 'enum', enum: ['pending', 'assigned', 'completed'], default: 'pending' },
         viewCount: { type: 'number', default: 0 },
         shortlistCount: { type: 'number', default: 0 },
         createdAt: { type: 'datetime', default: 'now' },

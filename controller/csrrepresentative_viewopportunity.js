@@ -9,10 +9,7 @@ class ViewOpportunityController {
     async viewOpportunity(data) {
         const { opportunityId, userId } = data;
         
-        // Track the view count
-        await this.entity.trackViews(opportunityId, userId);
-        
-        // Get specific opportunity details
+        // Get specific opportunity details (this already tracks views)
         const result = await this.entity.viewOpportunity(opportunityId);
         return result;
     }

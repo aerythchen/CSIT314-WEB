@@ -51,7 +51,7 @@ async function addTestData() {
             title: 'Food assistance for family of 4',
             description: 'Need groceries for a week for my family',
             urgency: 'high',
-            status: 'approved',
+            status: 'assigned',
             viewCount: 5,
             shortlistCount: 0,
             createdAt: new Date().toISOString(),

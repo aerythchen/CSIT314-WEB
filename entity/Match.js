@@ -17,15 +17,15 @@ class Match {
     async createMatch(matchData) {
         const match = {
             id: `match_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            requestId: matchData.requestId,
-            csrId: matchData.csrId,
-            serviceType: matchData.serviceType,
+            requestid: matchData.requestId,
+            csrid: matchData.csrId,
+            servicetype: matchData.serviceType,
             status: 'pending',
-            completedAt: null,
+            completedat: null,
             notes: matchData.notes || '',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isDeleted: false
+            createdat: new Date().toISOString(),
+            updatedat: new Date().toISOString(),
+            isdeleted: false
         };
 
         const result = await db.insert('matches', match);
@@ -43,11 +43,15 @@ class Match {
             return { success: false, error: "Match not found" };
         }
 
+        // Create updated match object, ensuring no duplicate fields
         const updatedMatch = {
             ...match,
             ...updateData,
-            updatedAt: new Date().toISOString()
+            updatedat: new Date().toISOString()
         };
+
+        // Remove the id field to avoid conflicts
+        delete updatedMatch.id;
 
         const result = await db.update('matches', matchId, updatedMatch);
         return result;
@@ -133,16 +137,16 @@ class Match {
     // MATCH STATUS MANAGEMENT
     // ========================================
     
-    completeMatch(matchId, notes = '') {
-        return this.updateMatch(matchId, {
+    async completeMatch(matchId, notes = '') {
+        return await this.updateMatch(matchId, {
             status: 'completed',
-            completedAt: new Date().toISOString(),
+            completedat: new Date().toISOString(),
             notes: notes
         });
     }
 
-    cancelMatch(matchId, notes = '') {
-        return this.updateMatch(matchId, {
+    async cancelMatch(matchId, notes = '') {
+        return await this.updateMatch(matchId, {
             status: 'cancelled',
             notes: notes
         });
@@ -222,23 +226,34 @@ class Match {
     // ========================================
     
     async getMatchStatistics(startDate, endDate) {
-        let matches = await db.findAll('matches', { isDeleted: false });
+        // Get completed requests instead of matches for more accurate reporting
+        let requests = await db.findAll('requests', { isdeleted: false });
 
-        // Filter by date range if provided
+        // Filter by date range if provided (use updatedat for completion date)
         if (startDate) {
-            matches = matches.filter(m => new Date(m.createdAt) >= new Date(startDate));
+            requests = requests.filter(r => {
+                const requestDate = r.updatedat || r.createdat; // Use completion date if available, otherwise creation date
+                const requestDateOnly = new Date(requestDate).toISOString().split('T')[0]; // Get just the date part
+                return requestDateOnly >= startDate;
+            });
         }
 
         if (endDate) {
-            matches = matches.filter(m => new Date(m.createdAt) <= new Date(endDate));
+            requests = requests.filter(r => {
+                const requestDate = r.updatedat || r.createdat; // Use completion date if available, otherwise creation date
+                const requestDateOnly = new Date(requestDate).toISOString().split('T')[0]; // Get just the date part
+                return requestDateOnly <= endDate;
+            });
         }
 
         const stats = {
-            total: matches.length,
-            pending: matches.filter(m => m.status === 'pending').length,
-            completed: matches.filter(m => m.status === 'completed').length,
-            cancelled: matches.filter(m => m.status === 'cancelled').length
+            total: requests.length,
+            pending: requests.filter(r => r.status === 'pending').length,
+            completed: requests.filter(r => r.status === 'completed').length,
+            assigned: requests.filter(r => r.status === 'assigned').length
         };
+
+        console.log(`Request statistics for ${startDate} to ${endDate}:`, stats);
 
         return {
             success: true,

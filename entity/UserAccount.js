@@ -265,8 +265,8 @@ class UserAccount {
     
     updateLastLogin(accountId) {
         return this.updateAccount(accountId, {
-            lastLogin: new Date().toISOString(),
-            loginAttempts: 0
+            lastlogin: new Date().toISOString(),
+            loginattempts: 0
         });
     }
 
@@ -277,14 +277,14 @@ class UserAccount {
             return { success: false, error: "Account not found" };
         }
 
-        const newAttempts = (account.loginAttempts || 0) + 1;
+        const newAttempts = (account.loginattempts || 0) + 1;
         
         // Lock account after 5 failed attempts
         if (newAttempts >= 5) {
             return this.lockAccount(accountId);
         }
 
-        return this.updateAccount(accountId, { loginAttempts: newAttempts });
+        return this.updateAccount(accountId, { loginattempts: newAttempts });
     }
 
     // ========================================

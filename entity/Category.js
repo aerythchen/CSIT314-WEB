@@ -19,10 +19,10 @@ class Category {
             name: categoryData.categoryName,
             description: categoryData.description || '',
             status: 'active',
-            requestCount: 0,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isDeleted: false
+            requestcount: 0,
+            createdat: new Date().toISOString(),
+            updatedat: new Date().toISOString(),
+            isdeleted: false
         };
 
         const result = await db.insert('categories', category);
@@ -40,10 +40,19 @@ class Category {
             return { success: false, error: "Category not found" };
         }
 
+        // Only update allowed fields to avoid database column errors
+        const allowedFields = ['name', 'description', 'status', 'requestcount'];
+        const filteredUpdateData = {};
+        
+        for (const field of allowedFields) {
+            if (updateData.hasOwnProperty(field)) {
+                filteredUpdateData[field] = updateData[field];
+            }
+        }
+
         const updatedCategory = {
-            ...category,
-            ...updateData,
-            updatedAt: new Date().toISOString()
+            ...filteredUpdateData,
+            updatedat: new Date().toISOString()
         };
 
         const result = await db.update('categories', categoryId, updatedCategory);
@@ -68,8 +77,8 @@ class Category {
         }
 
         const result = await db.update('categories', categoryId, {
-            isDeleted: true,
-            updatedAt: new Date().toISOString()
+            isdeleted: true,
+            updatedat: new Date().toISOString()
         });
 
         return result;
@@ -79,13 +88,8 @@ class Category {
     // CATEGORY SEARCH
     // ========================================
     
-    async searchCategories(searchTerm, status) {
-        let categories = await db.find('categories', { isDeleted: false });
-
-        // Filter by status
-        if (status && status !== 'all') {
-            categories = categories.filter(c => c.status === status);
-        }
+    async searchCategories(searchTerm) {
+        let categories = await db.find('categories', { isdeleted: false });
 
         // Filter by search term
         if (searchTerm) {
@@ -103,7 +107,7 @@ class Category {
     }
 
     async getAllCategories() {
-        const categories = await db.find('categories', { isDeleted: false });
+        const categories = await db.find('categories', { isdeleted: false });
 
         return {
             success: true,
@@ -120,7 +124,7 @@ class Category {
     async getActiveCategories() {
         const categories = await db.find('categories', { 
             status: 'active', 
-            isDeleted: false 
+            isdeleted: false 
         });
 
         return {
@@ -147,25 +151,25 @@ class Category {
     // ========================================
     
     async incrementRequestCount(categoryId) {
-        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
+        const category = await db.findOne('categories', { id: categoryId, isdeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
         }
 
-        const newRequestCount = (category.requestCount || 0) + 1;
-        return await this.updateCategory(categoryId, { requestCount: newRequestCount });
+        const newRequestCount = (category.requestcount || 0) + 1;
+        return await this.updateCategory(categoryId, { requestcount: newRequestCount });
     }
 
     async decrementRequestCount(categoryId) {
-        const category = await db.findOne('categories', { id: categoryId, isDeleted: false });
+        const category = await db.findOne('categories', { id: categoryId, isdeleted: false });
         
         if (!category) {
             return { success: false, error: "Category not found" };
         }
 
-        const newRequestCount = Math.max((category.requestCount || 0) - 1, 0);
-        return await this.updateCategory(categoryId, { requestCount: newRequestCount });
+        const newRequestCount = Math.max((category.requestcount || 0) - 1, 0);
+        return await this.updateCategory(categoryId, { requestcount: newRequestCount });
     }
 
     // ========================================
@@ -175,7 +179,7 @@ class Category {
     async validateCategoryName(name, excludeId = null) {
         const existingCategory = await db.findOne('categories', { 
             name: name, 
-            isDeleted: false 
+            isdeleted: false 
         });
 
         if (existingCategory && existingCategory.id !== excludeId) {
@@ -188,7 +192,7 @@ class Category {
     async getCategoryByName(name) {
         const category = await db.findOne('categories', { 
             name: name, 
-            isDeleted: false 
+            isdeleted: false 
         });
 
         if (!category) {
@@ -201,8 +205,8 @@ class Category {
     async getCategoryRequestCount(categoryId) {
         try {
             const count = await db.count('requests', { 
-                categoryId: categoryId, 
-                isDeleted: false 
+                categoryid: categoryId, 
+                isdeleted: false 
             });
             return { success: true, count: count };
         } catch (error) {

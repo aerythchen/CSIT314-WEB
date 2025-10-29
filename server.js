@@ -215,10 +215,12 @@ app.get('/useradmin/dashboard', (req, res) => {
 // API route to get categories
 app.get('/api/categories', async (req, res) => {
     try {
+        // Get all categories that are not deleted (less restrictive filter)
         const categories = await db.find('categories', {
-            isdeleted: false,
-            status: 'active'
+            isdeleted: false
         });
+
+        console.log(`Found ${categories.length} categories in database`);
 
         res.json({
             success: true,
@@ -359,7 +361,7 @@ app.get('/api/all-users', async (req, res) => {
                 email: profile.email,
                 userType: profile.usertype,
                 status: profile.status || 'active',
-                lastActive: profile.updatedat || null, // Only use updatedat - if null, user has never logged in
+                lastActive: account ? account.lastlogin : null, // Use lastlogin from account - if null, user has never logged in
                 accountId: account ? account.id : null,
                 username: account ? account.username : null,
                 createdAt: profile.createdat,
@@ -422,7 +424,7 @@ app.get('/api/search-users', async (req, res) => {
                 email: profile.email,
                 userType: profile.usertype,
                 status: profile.status || 'active',
-                lastActive: profile.updatedat || null, // Only use updatedat - if null, user has never logged in
+                lastActive: account ? account.lastlogin : null, // Use lastlogin from account - if null, user has never logged in
                 accountId: account ? account.id : null,
                 username: account ? account.username : null
             };
@@ -624,15 +626,8 @@ Press Ctrl+C to stop the server
 ════════════════════════════════════════════════════════════
     `);
     
-    // Run database migrations on startup
-    try {
-        console.log('🔄 Running database migrations...');
-        const runMigrations = require('./migrations/run-migrations');
-        await runMigrations();
-        console.log('✅ Database migrations completed\n');
-    } catch (error) {
-        console.error('❌ Migration failed:', error);
-    }
+    // Database migrations are handled by schema.sql
+    // The viewcount and shortlistcount columns are already defined in the schema
     
     // Update request status schema on server startup
     await updateRequestStatusSchema();
@@ -722,7 +717,7 @@ async function createTestData() {
             title: 'Food assistance for family of 4',
             description: 'Need groceries for a week for my family',
             urgency: 'high',
-            status: 'approved',
+            status: 'assigned',
             viewCount: 5,
             shortlistCount: 0,
             createdAt: new Date().toISOString(),
@@ -756,7 +751,7 @@ async function createTestData() {
             title: 'Medical transportation assistance',
             description: 'Need help getting to hospital appointments twice a week',
             urgency: 'medium',
-            status: 'approved',
+            status: 'assigned',
             viewCount: 2,
             shortlistCount: 0,
             createdAt: new Date().toISOString(),
@@ -790,7 +785,7 @@ async function createTestData() {
             title: 'Childcare assistance',
             description: 'Need help with childcare during work hours',
             urgency: 'high',
-            status: 'approved',
+            status: 'assigned',
             viewCount: 8,
             shortlistCount: 0,
             createdAt: new Date().toISOString(),
