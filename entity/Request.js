@@ -1479,6 +1479,54 @@ class Request {
         }
     }
 
+    // ========================================
+    // GET VIEW COUNT
+    // ========================================
+    
+    getViewCount(requestId) {
+        try {
+            const request = db.findOne('requests', { id: requestId, isDeleted: false });
+            
+            if (!request) {
+                return { success: false, error: "Request not found" };
+            }
+
+            return {
+                success: true,
+                data: {
+                    requestId: requestId,
+                    viewCount: request.viewcount || 0
+                }
+            };
+        } catch (error) {
+            return { success: false, error: "Failed to get view count" };
+        }
+    }
+
+    // ========================================
+    // GET SHORTLIST COUNT
+    // ========================================
+    
+    getShortlistCount(requestId) {
+        try {
+            const request = db.findOne('requests', { id: requestId, isDeleted: false });
+            
+            if (!request) {
+                return { success: false, error: "Request not found" };
+            }
+
+            return {
+                success: true,
+                data: {
+                    requestId: requestId,
+                    shortlistCount: request.shortlistcount || 0
+                }
+            };
+        } catch (error) {
+            return { success: false, error: "Failed to get shortlist count" };
+        }
+    }
+
 }
 
 module.exports = Request;

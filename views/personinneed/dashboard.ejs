@@ -749,6 +749,108 @@
             loadUserRequests();
             loadCompletedMatches(); // Load completed matches automatically
         });
+
+        // Function to get view count for a request
+        async function getViewCount(requestId) {
+            try {
+                const response = await fetch('/personinneed/get-view-count', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ requestId: requestId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update the view count badge in the table
+                    const viewCountElement = document.querySelector(`tr[data-request-id="${requestId}"] .view-count`);
+                    if (viewCountElement) {
+                        viewCountElement.textContent = data.data.viewCount || 0;
+                    }
+                    return data.data.viewCount || 0;
+                } else {
+                    console.error('Failed to get view count:', data.error);
+                    return 0;
+                }
+            } catch (error) {
+                console.error('Error getting view count:', error);
+                return 0;
+            }
+        }
+
+        // Function to get shortlist count for a request
+        async function getShortlistCount(requestId) {
+            try {
+                const response = await fetch('/personinneed/get-shortlist-count', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ requestId: requestId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update the shortlist count badge in the table
+                    const shortlistCountElement = document.querySelector(`tr[data-request-id="${requestId}"] .shortlist-count`);
+                    if (shortlistCountElement) {
+                        shortlistCountElement.textContent = data.data.shortlistCount || 0;
+                    }
+                    return data.data.shortlistCount || 0;
+                } else {
+                    console.error('Failed to get shortlist count:', data.error);
+                    return 0;
+                }
+            } catch (error) {
+                console.error('Error getting shortlist count:', error);
+                return 0;
+            }
+        }
+
+        // Function to refresh counts for all visible requests
+        async function refreshAllCounts() {
+            const requestRows = document.querySelectorAll('tr[data-request-id]');
+            
+            for (const row of requestRows) {
+                const requestId = row.getAttribute('data-request-id');
+                if (requestId) {
+                    // Get both counts for this request
+                    await Promise.all([
+                        getViewCount(requestId),
+                        getShortlistCount(requestId)
+                    ]);
+                }
+            }
+        }
+
+        // Add refresh button functionality
+        function addRefreshButton() {
+            // Find the search form area to add refresh button
+            const searchForm = document.querySelector('#searchForm');
+            if (searchForm) {
+                const refreshButton = document.createElement('button');
+                refreshButton.type = 'button';
+                refreshButton.className = 'btn btn-outline-primary btn-sm ms-2';
+                refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Counts';
+                refreshButton.onclick = refreshAllCounts;
+                
+                // Add it after the search button
+                const searchButton = searchForm.querySelector('button[type="submit"]');
+                if (searchButton) {
+                    searchButton.parentNode.appendChild(refreshButton);
+                }
+            }
+        }
+
+        // Initialize refresh button when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            addRefreshButton();
+        });
     </script>
 
     <!-- Create Request Modal -->

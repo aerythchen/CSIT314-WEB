@@ -19,7 +19,7 @@ app.get('/health', (req, res) => {
         uptime: process.uptime()
     });
 });
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Initialize and seed the database
 console.log('🌱 Initializing database...');
@@ -501,6 +501,63 @@ app.post('/personinneed/search-requests', async (req, res) => {
     }
 });
 
+// Route to get view count for a request
+app.post('/personinneed/get-view-count', async (req, res) => {
+    try {
+        if (!req.session.user || !req.session.user.id) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+        
+        const { requestId } = req.body;
+        
+        if (!requestId) {
+            return res.status(400).json({ success: false, error: 'Request ID is required' });
+        }
+        
+        const boundary = require('./boundary/personinneed_trackviews');
+        const boundaryInstance = new boundary();
+        
+        const result = await boundaryInstance.handleGetViewCount({
+            requestId: requestId,
+            userId: req.session.user.id
+        });
+        
+        res.json(result);
+        
+    } catch (error) {
+        console.error('Error getting view count:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// Route to get shortlist count for a request
+app.post('/personinneed/get-shortlist-count', async (req, res) => {
+    try {
+        if (!req.session.user || !req.session.user.id) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+        
+        const { requestId } = req.body;
+        
+        if (!requestId) {
+            return res.status(400).json({ success: false, error: 'Request ID is required' });
+        }
+        
+        const boundary = require('./boundary/personinneed_trackshortlist');
+        const boundaryInstance = new boundary();
+        
+        const result = await boundaryInstance.handleGetShortlistCount({
+            requestId: requestId,
+            userId: req.session.user.id
+        });
+        
+        res.json(result);
+        
+    } catch (error) {
+        console.error('Error getting shortlist count:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
