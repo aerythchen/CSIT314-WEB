@@ -215,14 +215,14 @@ app.get('/useradmin/dashboard', (req, res) => {
 // API route to get categories
 app.get('/api/categories', async (req, res) => {
     try {
-        const categories = await db.find('categories', { 
-            isDeleted: false, 
-            status: 'active' 
+        const categories = await db.find('categories', {
+            isdeleted: false,
+            status: 'active'
         });
-        
+
         res.json({
             success: true,
-            categories: categories
+            data: { categories }
         });
     } catch (error) {
         console.error('Error fetching categories:', error);

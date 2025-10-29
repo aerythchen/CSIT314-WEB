@@ -1298,6 +1298,7 @@ class Request {
             }
             
             // Add date range filter if provided
+            // For completed matches, date range should apply to completion date (updatedat)
             if (filters.dateRange && (filters.dateRange.from || filters.dateRange.to)) {
                 const dateQuery = {};
                 if (filters.dateRange.from) {
@@ -1308,7 +1309,7 @@ class Request {
                     toDate.setHours(23, 59, 59, 999); // End of day
                     dateQuery.$lte = toDate;
                 }
-                query.createdat = dateQuery;
+                query.updatedat = dateQuery;
             }
             
             const requests = await this.db.find('requests', query);

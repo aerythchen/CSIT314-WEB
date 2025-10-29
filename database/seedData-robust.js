@@ -4,10 +4,30 @@ const seedData = async (db) => {
     try {
         // Clear existing data first
         console.log('🧹 Clearing existing data...');
+        
+        // Clear requests first (due to foreign key constraints)
+        console.log('🗑️ Clearing existing requests...');
+        await db.hardDelete('requests', 'req_001');
+        await db.hardDelete('requests', 'req_002');
+        await db.hardDelete('requests', 'req_003');
+        await db.hardDelete('requests', 'req_004');
+        await db.hardDelete('requests', 'req_005');
+        
+        // Clear categories
+        console.log('🗑️ Clearing existing categories...');
+        await db.hardDelete('categories', 'cat_education_001');
+        await db.hardDelete('categories', 'cat_health_001');
+        await db.hardDelete('categories', 'cat_food_001');
+        
+        // Clear user accounts
+        console.log('🗑️ Clearing existing user accounts...');
         await db.hardDelete('userAccounts', 'account_pin_001');
         await db.hardDelete('userAccounts', 'account_csr_001');
         await db.hardDelete('userAccounts', 'account_pm_001');
         await db.hardDelete('userAccounts', 'account_ua_001');
+        
+        // Clear user profiles
+        console.log('🗑️ Clearing existing user profiles...');
         await db.hardDelete('userProfiles', 'profile_pin_001');
         await db.hardDelete('userProfiles', 'profile_csr_001');
         await db.hardDelete('userProfiles', 'profile_pm_001');

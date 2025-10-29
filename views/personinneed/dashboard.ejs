@@ -203,7 +203,7 @@
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">My Requests</h5>
-                        <a href="/personinneed/create-request" class="btn btn-primary">
+                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRequestModal">
                             <i class="fas fa-plus"></i> Create New Request
                         </a>
                     </div>
@@ -319,7 +319,7 @@
                 const response = await fetch('/api/categories');
                 const data = await response.json();
                 
-                if (data.success) {
+                if (data.success && data.data && data.data.categories) {
                     // Populate search category dropdown
                     const categorySelect = document.getElementById('category');
                     if (categorySelect) {
@@ -327,7 +327,7 @@
                         categorySelect.innerHTML = '';
                         categorySelect.appendChild(allCategoriesOption);
                         
-                        data.categories.forEach(category => {
+                        data.data.categories.forEach(category => {
                             const option = document.createElement('option');
                             option.value = category.name;
                             option.textContent = category.name;
