@@ -153,8 +153,8 @@
                                         <td><span class="badge bg-primary"><%= request.categoryname %></span></td>
                                         <td><span class="badge bg-warning"><%= request.status %></span></td>
                                         <td><span class="badge bg-info"><%= request.urgency %></span></td>
-                                        <td><span class="badge bg-secondary view-count"><%= request.viewcount || 0 %></span></td>
-                                        <td><span class="badge bg-warning shortlist-count"><%= request.shortlistcount || 0 %></span></td>
+                                        <td><span class="badge bg-secondary view-count"><i class="fas fa-spinner fa-spin"></i> Loading...</span></td>
+                                        <td><span class="badge bg-warning shortlist-count"><i class="fas fa-spinner fa-spin"></i> Loading...</span></td>
                                         <td><%= new Date(request.createdat).toLocaleDateString() %></td>
                                         <td>
                                             <div class="btn-group" role="group">
@@ -357,11 +357,17 @@
                         // Hide no-requests row
                         noRequestsRow.style.display = 'none';
                         
-                        // Add request rows
-                        data.data.requests.forEach(request => {
+                        // Add request rows and load counts dynamically
+                        for (const request of data.data.requests) {
                             const row = createRequestRow(request);
                             tbody.appendChild(row);
-                        });
+                            
+                            // Load counts for this request using tracking functions
+                            await Promise.all([
+                                getViewCount(request.id),
+                                getShortlistCount(request.id)
+                            ]);
+                        }
                     } else {
                         // Show no-requests row
                         noRequestsRow.style.display = '';
@@ -393,8 +399,8 @@
                 <td><span class="badge bg-primary">${request.categoryName || request.categoryname}</span></td>
                 <td><span class="badge ${statusClass}">${request.status}</span></td>
                 <td><span class="badge ${urgencyClass}">${request.urgency}</span></td>
-                <td><span class="badge bg-secondary view-count">${request.viewcount || 0}</span></td>
-                <td><span class="badge bg-warning shortlist-count">${request.shortlistcount || 0}</span></td>
+                <td><span class="badge bg-secondary view-count"><i class="fas fa-spinner fa-spin"></i> Loading...</span></td>
+                <td><span class="badge bg-warning shortlist-count"><i class="fas fa-spinner fa-spin"></i> Loading...</span></td>
                 <td>${createdDate}</td>
                 <td>
                     <div class="btn-group" role="group">
@@ -743,11 +749,30 @@
             new bootstrap.Modal(document.getElementById('editRequestModal')).show();
         }
 
+        // Load counts for search results displayed on page load
+        async function loadSearchResultCounts() {
+            const searchResultRows = document.querySelectorAll('tr[data-request-id]');
+            
+            for (const row of searchResultRows) {
+                const requestId = row.getAttribute('data-request-id');
+                if (requestId) {
+                    // Load both counts for this request
+                    await Promise.all([
+                        getViewCount(requestId),
+                        getShortlistCount(requestId)
+                    ]);
+                }
+            }
+        }
+
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', () => {
             loadCategories();
             loadUserRequests();
             loadCompletedMatches(); // Load completed matches automatically
+            
+            // Load counts for search results if they exist
+            loadSearchResultCounts();
         });
 
         // Function to get view count for a request
