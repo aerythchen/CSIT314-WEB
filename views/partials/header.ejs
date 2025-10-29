@@ -60,11 +60,11 @@
                 <ul class="navbar-nav">
                     <% if (user) { %>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 25px; padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1);">
+                            <a class="nav-link dropdown-toggle fw-semibold user-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user-circle me-1"></i>
-                                <%= user.firstName %>
+                                <%= user.firstName || user.name || 'User' %>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" style="border-radius: 15px; border: none; box-shadow: var(--shadow-medium);">
+                            <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu">
                                 <li><a class="dropdown-item fw-semibold" href="/<%= user.userType %>/dashboard">
                                     <i class="fas fa-home me-2"></i>Dashboard
                                 </a></li>

@@ -94,14 +94,15 @@ app.post('/bce/:boundary/:action', async (req, res) => {
         // Handle login session storage
         if (result.success && boundary.includes('_login') && result.data && result.data.user) {
             req.session.user = result.data.user;
-            console.log('✅ Session created for user:', result.data.user.name);
+            const userName = result.data.user.firstName || result.data.user.name || 'Unknown';
+            console.log('✅ Session created for user:', userName);
             
             // Update last active timestamp in user profile
             try {
                 await db.update('userProfiles', result.data.user.id, {
                     updatedat: new Date().toISOString()
                 });
-                console.log('✅ Updated last active timestamp for user:', result.data.user.name);
+                console.log('✅ Updated last active timestamp for user:', userName);
             } catch (error) {
                 console.error('⚠️ Failed to update last active timestamp:', error.message);
             }
@@ -161,7 +162,7 @@ app.get('/personinneed/dashboard', (req, res) => {
     const error = req.query.error || null;
     const success = req.query.success || null;
     res.render('personinneed/dashboard', { 
-        user: req.session.user || { name: 'Guest', id: null },
+        user: req.session.user || { firstName: 'Guest', lastName: '', id: null, userType: 'guest' },
         error: error,
         success: success
     });
@@ -172,7 +173,7 @@ app.get('/csrrepresentative/dashboard', (req, res) => {
     const error = req.query.error || null;
     const success = req.query.success || null;
     res.render('csrrepresentative/dashboard', { 
-        user: req.session.user || { name: 'Guest', id: null },
+        user: req.session.user || { firstName: 'Guest', lastName: '', id: null, userType: 'guest' },
         error: error,
         success: success
     });
@@ -182,7 +183,7 @@ app.get('/csrrepresentative/search-requests', (req, res) => {
     const error = req.query.error || null;
     const success = req.query.success || null;
     res.render('csrrepresentative/search_requests', { 
-        user: req.session.user || { name: 'Guest', id: null },
+        user: req.session.user || { firstName: 'Guest', lastName: '', id: null, userType: 'guest' },
         error: error,
         success: success
     });
@@ -192,7 +193,7 @@ app.get('/platformmanager/dashboard', (req, res) => {
     const error = req.query.error || null;
     const success = req.query.success || null;
     res.render('platformmanager/dashboard', { 
-        user: req.session.user || { name: 'Guest', id: null },
+        user: req.session.user || { firstName: 'Guest', lastName: '', id: null, userType: 'guest' },
         error: error,
         success: success
     });
@@ -203,7 +204,7 @@ app.get('/useradmin/dashboard', (req, res) => {
     const error = req.query.error || null;
     const success = req.query.success || null;
     res.render('useradmin/dashboard', { 
-        user: req.session.user || { name: 'Guest', id: null },
+        user: req.session.user || { firstName: 'Guest', lastName: '', id: null, userType: 'guest' },
         error: error,
         success: success
     });
@@ -459,7 +460,7 @@ app.post('/personinneed/search-requests', async (req, res) => {
             return res.redirect('/');
         }
         
-        const { category, status, dateFrom, dateTo } = req.body;
+        const { category, status, urgency, dateFrom, dateTo } = req.body;
         
         const boundary = require('./boundary/personinneed_searchrequest');
         const boundaryInstance = new boundary();
@@ -468,6 +469,7 @@ app.post('/personinneed/search-requests', async (req, res) => {
             userId: req.session.user.id,
             status: status,
             category: category,
+            urgency: urgency,
             dateRange: {
                 from: dateFrom,
                 to: dateTo
@@ -479,9 +481,10 @@ app.post('/personinneed/search-requests', async (req, res) => {
                 title: 'Dashboard',
                 user: req.session.user,
                 searchResults: result.data.requests,
-                searchTerm: searchTerm,
+                searchTerm: '', // No search term in this form
                 searchStatus: status,
-                searchCategory: category
+                searchCategory: category,
+                searchUrgency: urgency
             });
         } else {
             res.render('personinneed/dashboard', {
@@ -555,6 +558,29 @@ app.post('/personinneed/get-shortlist-count', async (req, res) => {
         
     } catch (error) {
         console.error('Error getting shortlist count:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// Route for person in need search history
+app.post('/personinneed/search-history', async (req, res) => {
+    try {
+        if (!req.session.user || !req.session.user.id) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+        
+        const data = req.body;
+        data.userId = req.session.user.id;
+        
+        const boundary = require('./boundary/personinneed_searchhistory');
+        const boundaryInstance = new boundary();
+        
+        const result = await boundaryInstance.handleSearchHistory(data);
+        
+        res.json(result);
+        
+    } catch (error) {
+        console.error('Error searching history:', error);
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });

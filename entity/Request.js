@@ -1287,6 +1287,16 @@ class Request {
                 query.categoryname = filters.category;
             }
             
+            // Add urgency filter if provided
+            if (filters.urgency) {
+                query.urgency = filters.urgency;
+            }
+            
+            // Add status filter if provided
+            if (filters.status) {
+                query.status = filters.status;
+            }
+            
             // Add date range filter if provided
             if (filters.dateRange && (filters.dateRange.from || filters.dateRange.to)) {
                 const dateQuery = {};
@@ -1352,6 +1362,11 @@ class Request {
             // Add category filter
             if (filters.category && filters.category !== '') {
                 query.categoryname = filters.category;
+            }
+            
+            // Add urgency filter
+            if (filters.urgency && filters.urgency !== '') {
+                query.urgency = filters.urgency.toLowerCase();
             }
             
             // Get all requests first

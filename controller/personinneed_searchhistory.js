@@ -6,7 +6,7 @@ class SearchHistoryController {
     }
 
     async searchHistory(data) {
-        const { userId, category, dateRange } = data;
+        const { userId, category, urgency, status, dateFrom, dateTo } = data;
         
         console.log(`SearchHistoryController: Searching completed requests for user ${userId}`);
         
@@ -15,8 +15,14 @@ class SearchHistoryController {
         if (category) {
             filters.category = category;
         }
-        if (dateRange) {
-            filters.dateRange = dateRange;
+        if (urgency) {
+            filters.urgency = urgency;
+        }
+        if (status) {
+            filters.status = status;
+        }
+        if (dateFrom || dateTo) {
+            filters.dateRange = { from: dateFrom, to: dateTo };
         }
         
         // Use Request entity to search completed requests with filters

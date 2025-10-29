@@ -6,11 +6,11 @@ class SearchRequestController {
     }
 
     async searchRequest(data) {
-        const { userId, searchTerm, status, dateRange } = data;
+        const { userId, searchTerm, status, category, urgency, dateRange } = data;
         console.log("SearchRequestController: Processing search request...");
         
         // Use Entity to search user's requests
-        return await this.entity.searchUserRequests(userId, { searchTerm, status, dateRange });
+        return await this.entity.searchUserRequests(userId, { searchTerm, status, category, urgency, dateRange });
     }
 
 }

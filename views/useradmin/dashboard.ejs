@@ -435,7 +435,7 @@
     
     <%- include('../partials/footer') %>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS is loaded in footer -->
     <script>
         // Global variables
         let currentUsers = [];
@@ -669,6 +669,7 @@
                     showSuccess('User created successfully!');
                     bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
                     loadAllUsers();
+                    loadUserStats(); // Refresh statistics after creating user
                 } else {
                     showError(data.error || 'Failed to create user');
                 }
@@ -760,6 +761,7 @@
                     showSuccess('User updated successfully!');
                     bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
                     loadAllUsers();
+                    loadUserStats(); // Refresh statistics after updating user
                 } else {
                     showError(data.error || 'Failed to update user');
                 }
@@ -797,6 +799,7 @@
                     showSuccess('User deleted successfully!');
                     bootstrap.Modal.getInstance(document.getElementById('deleteUserModal')).hide();
                     loadAllUsers();
+                    loadUserStats(); // Refresh statistics after deleting user
                 } else {
                     showError(data.error || 'Failed to delete user');
                 }

@@ -39,8 +39,8 @@
                 
                 <!-- Quick Actions -->
                 <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-center">
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
                             <div class="card-body">
                                 <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
                                 <h5>Create Request</h5>
@@ -48,8 +48,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
                             <div class="card-body">
                                 <i class="fas fa-list fa-3x text-info mb-3"></i>
                                 <h5>My Requests</h5>
@@ -57,8 +57,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
                             <div class="card-body">
                                 <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                                 <h5>Completed Matches</h5>
@@ -74,17 +74,17 @@
                         <h5><i class="fas fa-search"></i> Search My Requests</h5>
                     </div>
                     <div class="card-body">
-                        <form action="/personinneed/search-requests" method="POST">
+                        <form id="search-requests-form" action="/personinneed/search-requests" method="POST">
                             <input type="hidden" name="userId" value="<%= user.id %>">
                             <div class="row g-3">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="category" class="form-label">Category</label>
                                     <select class="form-select" id="category" name="category">
                                         <option value="">All Categories</option>
                                         <!-- Categories will be loaded dynamically -->
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="status" class="form-label">Status</label>
                                     <select class="form-select" id="status" name="status">
                                         <option value="">All Status</option>
@@ -92,21 +92,29 @@
                                         <option value="assigned">Assigned</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
+                                    <label for="urgency" class="form-label">Urgency</label>
+                                    <select class="form-select" id="urgency" name="urgency">
+                                        <option value="">All Urgency Levels</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
                                     <label for="dateFrom" class="form-label">Date From</label>
                                     <input type="date" class="form-control" id="dateFrom" name="dateFrom">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label for="dateTo" class="form-label">Date To</label>
                                     <input type="date" class="form-control" id="dateTo" name="dateTo">
                                 </div>
-                            </div>
-                            <div class="row g-3 mt-2">
-                                <div class="col-md-12">
+                                <div class="col-md-2">
                                     <label class="form-label">&nbsp;</label>
-                                    <div>
-                                        <button type="submit" class="btn btn-primary me-2">
-                                            <i class="fas fa-search"></i> Search Requests
+                                    <div class="d-flex flex-column gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i> Search
                                         </button>
                                         <button type="button" class="btn btn-secondary" onclick="clearSearchForm()">
                                             <i class="fas fa-times"></i> Clear
@@ -120,15 +128,20 @@
                 
                 <!-- Search Results (if any) -->
                 <% if (typeof searchResults !== 'undefined' && searchResults) { %>
-                <div class="card mb-4">
+                <div class="card mb-4" id="search-results-section">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="fas fa-search"></i> Search Results 
                             <span class="badge bg-primary"><%= searchResults.length %> found</span>
                         </h5>
-                        <a href="/personinneed/dashboard" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Clear Search
-                        </a>
+                        <div>
+                            <button onclick="scrollToSearchForm()" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-arrow-up"></i> Back to Search
+                            </button>
+                            <a href="/personinneed/dashboard" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear Search
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
                         <% if (searchResults.length > 0) { %>
@@ -149,7 +162,12 @@
                                 <tbody>
                                     <% searchResults.forEach(request => { %>
                                     <tr data-request-id="<%= request.id %>">
-                                        <td><%= request.title %></td>
+                                        <td>
+                                            <strong><%= request.title %></strong>
+                                            <% if (request.description) { %>
+                                                <br><small class="text-muted"><%= request.description %></small>
+                                            <% } %>
+                                        </td>
                                         <td><span class="badge bg-primary"><%= request.categoryname %></span></td>
                                         <td><span class="badge bg-warning"><%= request.status %></span></td>
                                         <td><span class="badge bg-info"><%= request.urgency %></span></td>
@@ -161,7 +179,7 @@
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editRequest('<%= request.id %>')" title="Edit Request">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRequest('<%= request.id %>')" title="Delete Request">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="showDeleteRequestModal('<%= request.id %>')" title="Delete Request">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -395,7 +413,10 @@
             const urgencyClass = getUrgencyBadgeClass(request.urgency);
             
             row.innerHTML = `
-                <td>${request.title}</td>
+                <td>
+                    <strong>${request.title}</strong>
+                    ${request.description ? `<br><small class="text-muted">${request.description}</small>` : ''}
+                </td>
                 <td><span class="badge bg-primary">${request.categoryName || request.categoryname}</span></td>
                 <td><span class="badge ${statusClass}">${request.status}</span></td>
                 <td><span class="badge ${urgencyClass}">${request.urgency}</span></td>
@@ -407,7 +428,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editRequest('${request.id}')" title="Edit Request">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRequest('${request.id}')" title="Delete Request">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="showDeleteRequestModal('${request.id}')" title="Delete Request">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -442,6 +463,7 @@
         function clearSearchForm() {
             document.getElementById('category').value = '';
             document.getElementById('status').value = '';
+            document.getElementById('urgency').value = '';
             document.getElementById('dateFrom').value = '';
             document.getElementById('dateTo').value = '';
         }
@@ -449,6 +471,12 @@
         // Scroll to completed matches section
         function scrollToCompletedMatches() {
             const section = document.getElementById('completed-matches-section');
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Scroll to search form section
+        function scrollToSearchForm() {
+            const section = document.getElementById('requests-section');
             section.scrollIntoView({ behavior: 'smooth' });
         }
         
@@ -473,7 +501,7 @@
                 const response = await fetch('/api/completed-requests');
                 const data = await response.json();
                 
-                if (data.success && data.data.requests) {
+                if (data.success && data.data && data.data.requests) {
                     displayCompletedMatches(data.data.requests);
                 } else {
                     showNoCompletedMatches();
@@ -503,38 +531,14 @@
                 });
                 
                 if (response.ok) {
-                    // Parse the HTML response to extract the completed requests data
-                    const html = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
+                    // Parse the JSON response
+                    const data = await response.json();
                     
-                    // Extract completed requests from the response
-                    const completedRequests = [];
-                    const rows = doc.querySelectorAll('#completed-matches-table-body tr');
-                    rows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length > 0) {
-                            const title = cells[0].querySelector('strong')?.textContent || '';
-                            const category = cells[1].textContent.trim();
-                            const urgency = cells[2].textContent.trim();
-                            const datePosted = cells[3].textContent.trim();
-                            const dateCompleted = cells[4].textContent.trim();
-                            const views = cells[5].textContent.trim();
-                            const shortlists = cells[6].textContent.trim();
-                            
-                            completedRequests.push({
-                                title,
-                                categoryname: category,
-                                urgency,
-                                createdat: datePosted,
-                                updatedat: dateCompleted,
-                                viewcount: parseInt(views) || 0,
-                                shortlistcount: parseInt(shortlists) || 0
-                            });
-                        }
-                    });
-                    
-                    displayCompletedMatches(completedRequests);
+                    if (data.success && data.data && data.data.requests) {
+                        displayCompletedMatches(data.data.requests);
+                    } else {
+                        showNoCompletedMatches();
+                    }
                 } else {
                     showNoCompletedMatches();
                 }
@@ -613,11 +617,16 @@
             }
         }
         
+        // Show Delete Request Modal
+        function showDeleteRequestModal(requestId) {
+            document.getElementById('deleteRequestId').value = requestId;
+            const modal = new bootstrap.Modal(document.getElementById('deleteRequestModal'));
+            modal.show();
+        }
+        
         // Delete Request Function
-        async function deleteRequest(requestId) {
-            if (!confirm('Are you sure you want to delete this request? This action cannot be undone.')) {
-                return;
-            }
+        async function deleteRequest() {
+            const requestId = document.getElementById('deleteRequestId').value;
             
             try {
                 const formData = new FormData();
@@ -634,6 +643,8 @@
                 
                 if (data.success) {
                     showSuccess(data.message || 'Request deleted successfully!');
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('deleteRequestModal')).hide();
                     // Reload the requests list
                     loadUserRequests();
                 } else {
@@ -737,12 +748,19 @@
             }
             
             // Extract data from the table row
-            const title = requestRow.cells[0].textContent.trim();
+            const titleCell = requestRow.cells[0];
+            const title = titleCell.querySelector('strong') ? titleCell.querySelector('strong').textContent.trim() : titleCell.textContent.trim();
+            
+            // Extract description from the small text in the title cell
+            const descriptionElement = titleCell.querySelector('small.text-muted');
+            const description = descriptionElement ? descriptionElement.textContent.trim() : '';
+            
             const urgency = requestRow.cells[3].textContent.trim().toLowerCase();
             
             // Fill the edit form
             document.getElementById('editRequestId').value = requestId;
             document.getElementById('editTitle').value = title;
+            document.getElementById('editDescription').value = description;
             document.getElementById('editUrgency').value = urgency;
             
             // Show the modal
@@ -771,8 +789,42 @@
             loadUserRequests();
             loadCompletedMatches(); // Load completed matches automatically
             
+            // Scroll to search results if they exist
+            <% if (typeof searchResults !== 'undefined' && searchResults) { %>
+            setTimeout(() => {
+                const searchResultsSection = document.getElementById('search-results-section');
+                if (searchResultsSection) {
+                    searchResultsSection.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                    // Add a subtle highlight effect
+                    searchResultsSection.style.border = '2px solid #007bff';
+                    searchResultsSection.style.borderRadius = '10px';
+                    setTimeout(() => {
+                        searchResultsSection.style.border = '';
+                    }, 3000);
+                }
+            }, 500);
+            <% } %>
+            
             // Load counts for search results if they exist
             loadSearchResultCounts();
+            
+            // Add search form submit handler
+            const searchForm = document.getElementById('search-requests-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    // Show loading state
+                    const submitBtn = searchForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+                    submitBtn.disabled = true;
+                    
+                    // The form will submit normally, but we've provided visual feedback
+                    // The scroll to results will happen on page reload via the EJS condition above
+                });
+            }
         });
 
         // Function to get view count for a request
@@ -904,9 +956,9 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="createDescription" class="form-label">Description</label>
+                            <label for="createDescription" class="form-label">Description *</label>
                             <textarea class="form-control" id="createDescription" name="description" rows="4" 
-                                      placeholder="Please provide detailed information about your request (optional)..."></textarea>
+                                      placeholder="Write your description..." required></textarea>
                         </div>
                         
                         <div class="row">
@@ -964,9 +1016,9 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="editDescription" class="form-label">Description</label>
+                            <label for="editDescription" class="form-label">Description *</label>
                             <textarea class="form-control" id="editDescription" name="description" rows="4" 
-                                      placeholder="Please provide detailed information about your request (optional)..."></textarea>
+                                      placeholder="Write your description..." required></textarea>
                         </div>
                     </form>
                 </div>
@@ -974,6 +1026,34 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" onclick="updateRequest()">
                         <i class="fas fa-save"></i> Update Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Request Modal -->
+    <div class="modal fade" id="deleteRequestModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-trash text-danger"></i> Delete Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this request?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> This action cannot be undone. The request will be permanently removed.
+                    </div>
+                    <form id="deleteRequestForm">
+                        <input type="hidden" id="deleteRequestId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteRequest()">
+                        <i class="fas fa-trash"></i> Delete Request
                     </button>
                 </div>
             </div>

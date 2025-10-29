@@ -498,12 +498,63 @@ body > *:first-child {
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
 }
 
-.dropdown-menu {
-    border-radius: 15px !important;
-    border: none !important;
-    box-shadow: var(--shadow-medium) !important;
+/* User dropdown toggle button */
+.user-dropdown-toggle {
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-speed);
+}
+
+.user-dropdown-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* User dropdown menu */
+.user-dropdown-menu {
+    border-radius: 15px;
+    border: none;
+    box-shadow: var(--shadow-medium);
     padding: 0.5rem 0;
     margin-top: 0.5rem;
+    position: absolute;
+    right: 0;
+    left: auto;
+    min-width: 200px;
+    max-width: 300px;
+    transform: translateX(0);
+    z-index: 1050;
+}
+
+/* General dropdown menu styles */
+.dropdown-menu {
+    border-radius: 15px;
+    border: none;
+    box-shadow: var(--shadow-medium);
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+}
+
+/* Ensure dropdown doesn't overflow viewport */
+.dropdown-menu.dropdown-menu-end {
+    right: 0;
+    left: auto;
+    transform: translateX(0);
+}
+
+/* Prevent navbar from causing overflow */
+.navbar {
+    overflow: visible !important;
+}
+
+.navbar-nav {
+    overflow: visible !important;
+}
+
+.dropdown {
+    position: relative !important;
+    overflow: visible !important;
 }
 
 .dropdown-item {
