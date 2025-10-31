@@ -1,7 +1,6 @@
 const PostgreSQLDB = require('./PostgreSQLDB');
 const models = require('./models');
 const seedData = require('./seedData-robust');
-const { UserProfileHelpers, UserAccountHelpers, CategoryHelpers, RequestHelpers, ShortlistHelpers, SessionHelpers, MatchHelpers } = require('./helpers');
 
 const db = PostgreSQLDB.getInstance();
 
@@ -15,16 +14,9 @@ db.testConnection().then(success => {
     }
 });
 
-// Export the database instance and helpers
+// Export the database instance and utilities
 module.exports = {
     db: db, // Export the PostgreSQL instance
     models,
-    seedDatabase: () => seedData(db),
-    UserProfileHelpers,
-    UserAccountHelpers,
-    CategoryHelpers,
-    RequestHelpers,
-    ShortlistHelpers,
-    SessionHelpers,
-    MatchHelpers
+    seedDatabase: () => seedData(db)
 };

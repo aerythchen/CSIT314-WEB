@@ -1,10 +1,8 @@
 const { Pool } = require('pg');
 const config = require('./config');
 
-/**
- * PostgreSQL Database Adapter
- * Provides the same interface as InMemoryDB but uses PostgreSQL
- */
+// Converts Javascript calls into SQL that PostgreSQL can understand
+ 
 class PostgreSQLDB {
     constructor() {
         if (PostgreSQLDB.instance) {

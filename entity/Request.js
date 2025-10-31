@@ -1,5 +1,4 @@
 const { db } = require('../database');
-const { RequestHelpers } = require('../database/helpers');
 const Match = require('./Match');
 
 /**

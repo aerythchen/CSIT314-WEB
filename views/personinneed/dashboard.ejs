@@ -18,7 +18,7 @@
                 <div class="dashboard-header text-center">
                     <h1>
                         <i class="fas fa-user-heart me-3"></i>
-                        Welcome, <%= user.name %>
+                        Welcome, <%= user.firstName %> <%= user.lastName %>
                     </h1>
                     <p>Manage your assistance requests and track your progress</p>
                 </div>
@@ -768,25 +768,6 @@
             loadUserRequests();
             loadCompletedMatches(); // Load completed matches automatically
             
-            // Scroll to search results if they exist
-            <% if (typeof searchResults !== 'undefined' && searchResults) { %>
-            setTimeout(() => {
-                const searchResultsSection = document.getElementById('search-results-section');
-                if (searchResultsSection) {
-                    searchResultsSection.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
-                    // Add a subtle highlight effect
-                    searchResultsSection.style.border = '2px solid #007bff';
-                    searchResultsSection.style.borderRadius = '10px';
-                    setTimeout(() => {
-                        searchResultsSection.style.border = '';
-                    }, 3000);
-                }
-            }, 500);
-            <% } %>
-            
             // Load counts for search results if they exist
             loadSearchResultCounts();
             
@@ -908,6 +889,28 @@
             addRefreshButton();
         });
     </script>
+
+    <!-- Scroll to search results if they exist -->
+    <% if (typeof searchResults !== 'undefined' && searchResults) { %>
+    <script>
+        // Scroll to search results after page loads
+        setTimeout(() => {
+            const searchResultsSection = document.getElementById('search-results-section');
+            if (searchResultsSection) {
+                searchResultsSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                // Add a subtle highlight effect
+                searchResultsSection.style.border = '2px solid #007bff';
+                searchResultsSection.style.borderRadius = '10px';
+                setTimeout(() => {
+                    searchResultsSection.style.border = '';
+                }, 3000);
+            }
+        }, 500);
+    </script>
+    <% } %>
 
     <!-- Create Request Modal -->
     <div class="modal fade" id="createRequestModal" tabindex="-1">

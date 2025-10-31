@@ -1,3 +1,5 @@
+// just for reference, not used in the project
+
 const models = {
     userProfiles: {
         id: { type: 'string', required: true, unique: true },

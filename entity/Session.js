@@ -1,5 +1,4 @@
 const { db } = require('../database');
-const { SessionHelpers } = require('../database/helpers');
 
 /**
  * Session Entity - Handles session business logic

@@ -1,5 +1,4 @@
 const { db } = require('../database');
-const { SessionHelpers } = require('../database/helpers');
 
 /**
  * UserProfile Entity - Handles user profile business logic

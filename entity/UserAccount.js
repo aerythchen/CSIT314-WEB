@@ -1,5 +1,4 @@
 const { db } = require('../database');
-const { SessionHelpers } = require('../database/helpers');
 const Session = require('./Session');
 
 /**
